@@ -17,4 +17,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGUAGE: Korean
-          MODEL: gpt-3.5-turbo
+          MODEL: gpt-4-turbo
+          PROMPT: |
+            You are a performance optimization expert. Review this code and pay attention to the following aspects:
+            1. Inefficient algorithms
+            2. Unnecessary loops or operations
+            3. Opportunities for memory usage optimization
+            4. Database query optimization (if applicable)
+            Please provide specific suggestions to improve performance.
