@@ -33,7 +33,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     nickname = models.CharField(max_length=50, unique=True)
     phone_num = models.CharField(max_length=20, blank=True, null=True)
-    profile = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile = models.ImageField(upload_to='media/profiles/', blank=True, null=True)
     is_player = models.BooleanField(default=False)
     is_team = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -49,7 +49,7 @@ class CustomUser(AbstractUser):
 class Team(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='team')
     team_name = models.CharField(max_length=100)
-    team_picture = models.ImageField(upload_to='team_pictures/', blank=True, null=True)
+    team_picture = models.ImageField(upload_to='media/team_pictures/', blank=True, null=True)
     team_description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
