@@ -19,7 +19,7 @@ class Post(models.Model):
 
 class Image(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
-    image_url = models.ImageField(upload_to='post_images/')
+    image_url = models.ImageField(upload_to='media/post_images/')
 
     def __str__(self):
         return f"Image for post: {self.post.title}"
