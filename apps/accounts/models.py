@@ -1,7 +1,9 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import AbstractUser, Group
+
 
 class CustomUser(AbstractUser):
     user_permissions = models.ManyToManyField(
@@ -35,7 +37,11 @@ class CustomUser(AbstractUser):
     is_player = models.BooleanField(default=False)
     is_team = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True)
+
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()  # 현재 시간으로 업데이트
+        super().save(*args, **kwargs)
 
     def str(self):
         return self.username
@@ -46,22 +52,38 @@ class Team(models.Model):
     team_picture = models.ImageField(upload_to='team_pictures/', blank=True, null=True)
     team_description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True)
+
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()  # 현재 시간으로 업데이트
+        super().save(*args, **kwargs)
 
     def str(self):
         return self.team_name
 
 class Player(models.Model):
+    POSITION_CHOICES = [
+        ('GK', 'Goalkeeper'),
+        ('DF', 'Defender'),
+        ('MF', 'Midfielder'),
+        ('FW', 'Forward'),
+    ]
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='player')
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='players')
     player_name = models.CharField(max_length=100)
-    position = models.CharField(max_length=50)
+    position = models.CharField(max_length=5, choices=POSITION_CHOICES)
     birthday = models.DateField()
     height = models.FloatField()
     weight = models.FloatField()
     back_number = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True)
+
+  
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()  # 현재 시간으로 업데이트
+        super().save(*args, **kwargs)
 
     def str(self):
         return self.player_name

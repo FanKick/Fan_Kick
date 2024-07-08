@@ -9,7 +9,11 @@ class SubscriptionPlan(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     duration = models.PositiveIntegerField(help_text='구독기간')
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True)
+
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()  # 현재 시간으로 업데이트
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.sub_name
