@@ -1,6 +1,6 @@
+
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import AbstractUser, Group
 
@@ -31,13 +31,13 @@ class CustomUser(AbstractUser):
 
     role = models.CharField(max_length=10, choices=USER_ROLES, default='user')
     email = models.EmailField(unique=True)
-    nickname = models.CharField(max_length=50, unique=True)
+    username = models.CharField(max_length=50, unique=True) # 기본 제공 필드 username으로 닉네임 대체
     phone_num = models.CharField(max_length=20, blank=True, null=True)
     profile = models.ImageField(upload_to='media/profiles/', blank=True, null=True)
     is_player = models.BooleanField(default=False)
     is_team = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()  # 현재 시간으로 업데이트
@@ -52,7 +52,7 @@ class Team(models.Model):
     team_picture = models.ImageField(upload_to='media/team_pictures/', blank=True, null=True)
     team_description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()  # 현재 시간으로 업데이트
@@ -78,7 +78,7 @@ class Player(models.Model):
     weight = models.FloatField()
     back_number = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
 
   
     def save(self, *args, **kwargs):
