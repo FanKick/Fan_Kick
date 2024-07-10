@@ -58,7 +58,7 @@ class Team(models.Model):
         self.updated_at = timezone.now()  # 현재 시간으로 업데이트
         super().save(*args, **kwargs)
 
-    def str(self):
+    def __str__(self):
         return self.team_name
 
 class Player(models.Model):
