@@ -39,6 +39,8 @@ class CustomUser(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(blank=True, null=True)
 
+    joined_teams = models.ManyToManyField('Team', through='Membership', related_name='members', blank=True)
+
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()  # 현재 시간으로 업데이트
         super().save(*args, **kwargs)
@@ -87,3 +89,12 @@ class Player(models.Model):
 
     def str(self):
         return self.player_name
+    
+class Membership(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.team.team_name}"
