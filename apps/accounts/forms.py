@@ -1,6 +1,24 @@
 from django import forms
+from .models import Team, CustomUser, Player
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(TeamForm, self).__init__(*args, **kwargs)
+        self.fields['user'].queryset = CustomUser.objects.filter(is_team=True)
+
+class PlayerForm(forms.ModelForm):
+    class Meta:
+        model = Player
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(PlayerForm, self).__init__(*args, **kwargs)
+        self.fields['user'].queryset = CustomUser.objects.filter(is_player=True)
 
 class SignUpForm(UserCreationForm): # 'username', 'password1', 'password2'는 UserCreationForm 기본 제공 
     email = forms.EmailField(max_length=254, widget=forms.EmailInput(attrs={'placeholder': 'your@email.com', 'style': 'color: grey;'}))
