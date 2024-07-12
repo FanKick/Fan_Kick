@@ -22,6 +22,7 @@ from . import views
 from django.conf import settings
 
 urlpatterns = [
+    path('__debug__/', include('debug_toolbar.urls')),
     path('admin/', admin.site.urls),
     path('', views.home, name='index'),
     path('home/', views.home, name='home'),

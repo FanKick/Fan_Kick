@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'accounts/signup_step1.css' %}">
+<div class="container-211">
+  <h2>FANKICK account</h2>
+  <p>FANKICK 계정으로<br>로그인이나 회원가입해주세요</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      {{ form.email.label_tag}}
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="error">
+          {% for error in form.email.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">이메일로 계속하기</button>
+  </form>
+</div>
+{% endblock %}
