@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'apps.accounts',
     'apps.alert',
     'apps.chattings',
@@ -59,7 +60,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# Debug Toolbar 설정
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
 
 ROOT_URLCONF = 'config.urls'
 
@@ -144,3 +155,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# 이메일 관련 설정
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.naver.com'  # SMTP 호스트
+EMAIL_PORT = 587  # SMTP 포트
+EMAIL_USE_TLS = True  # TLS 보안 설정
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_ID")  # 이메일 사용자
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # 이메일 비밀번호
+
+# 이메일 인증 관련 설정
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # 보내는 사람 이메일 주소
+
+# 세션 엔진 설정
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+SITE_URL = 'http://localhost:8000'

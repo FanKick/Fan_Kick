@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'accounts/signup_done.css' %}">
+<div class="container-211">
+  <h2>FANKICK account</h2>
+  <h4>이제 이메일을 인증해주세요!</h4>
+  <p>회원가입 확인 링크가 포함된 이메일이 발송되었습니다.</p>
+  <p>이메일을 확인하여 계정을 활성화 해주시길 바랍니다.</p>
+  <a href="{% url 'accounts:login' %}" class="btn btn-primary">로그인으로 돌아가기</a>
+</div>
+{% endblock %}

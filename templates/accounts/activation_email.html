@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation</title>
+</head>
+<body>
+    <h2>계정 활성화를 위한 이메일</h2>
+    <p>{{ user.username }}님, 안녕하세요!</p>
+    <p>아래 링크를 클릭하여 회원가입을 완료해주세요.</p>
+    <p><a href="{{ activation_url }}" style="background-color: #007BFF; color: white; padding: 10px 20px; text-decoration: none; display: inline-block;">계정 활성화 링크</a></p>
+    <p>이 링크는 FANKICK에서 생성되었습니다.</p>
+    <p>이 링크는 24시간 동안 유효합니다. 링크의 유효 기간이 지나면 새로운 링크를 요청해주세요.</p>
+    <p>계정 활성화에 관한 문의사항이 있으면, 고객센터로 문의해주세요.</p>
+</body>
+</html>
