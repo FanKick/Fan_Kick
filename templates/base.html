@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <title>Fan Kick</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
         html,
@@ -121,9 +121,9 @@
         }
 
         /* 레이아웃체크용 */
-        .main-content .container {
+        /*.main-content .container {
             background-color: gray;
-        }
+        }*/
 
         .footer {
             height: 380px;
@@ -223,7 +223,7 @@
                                         <path d="M12 20.5713C11.1334 20.5713 10.3191 20.5422 9.55286 20.4856C9.71622 21.0067 10.0417 21.4621 10.4818 21.7854C10.922 22.1087 11.4539 22.283 12 22.283C12.5461 22.283 13.078 22.1087 13.5182 21.7854C13.9583 21.4621 14.2838 21.0067 14.4471 20.4856C13.6809 20.5422 12.8666 20.5713 12 20.5713Z" fill="#171A1F"/>
                                     </svg>
                                 </a></li>
-                                <li><a href = "#">
+                                <li><a href = "{% url 'accounts:update_user_info' %}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none">
                                         <path d="M2.57144 21.4286C2.57144 16.6946 6.40887 12.8572 11.1429 12.8572H12.8572C17.5912 12.8572 21.4286 16.6946 21.4286 21.4286" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
                                         <path d="M12 12.8572C14.8403 12.8572 17.1429 10.5547 17.1429 7.71439C17.1429 4.87407 14.8403 2.57153 12 2.57153C9.15968 2.57153 6.85715 4.87407 6.85715 7.71439C6.85715 10.5547 9.15968 12.8572 12 12.8572Z" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
