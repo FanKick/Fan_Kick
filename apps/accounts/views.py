@@ -142,3 +142,65 @@ from django.contrib.auth import logout
 def logout_view(request):
     logout(request)
     return redirect('home')  # 로그아웃 후 리디렉션할 URL
+
+
+# 마이페이지 - 회원정보수정
+from django.contrib.auth.decorators import login_required
+from .forms import UpdateUsernameForm, UpdatePhoneNumForm, UpdateProfileForm, UpdatePasswordForm
+
+@login_required
+def update_user_info(request):
+    if request.method == 'POST':
+        username_form = UpdateUsernameForm(instance=request.user)
+        phone_num_form = UpdatePhoneNumForm(instance=request.user)
+        profile_form = UpdateProfileForm(instance=request.user)
+        password_form = UpdatePasswordForm()
+
+        if 'update_username' in request.POST:
+            username_form = UpdateUsernameForm(request.POST, instance=request.user)
+            if username_form.is_valid():
+                username_form.save()
+                messages.success(request, '닉네임이 성공적으로 수정되었습니다.')
+                return redirect('accounts:update_user_info')
+        elif 'update_phone_num' in request.POST:
+            phone_num_form = UpdatePhoneNumForm(request.POST, instance=request.user)
+            if phone_num_form.is_valid():
+                phone_num_form.save()
+                messages.success(request, '전화번호가 성공적으로 수정되었습니다.')
+                return redirect('accounts:update_user_info')
+        elif 'update_profile' in request.POST:
+            profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, '프로필 사진이 성공적으로 수정되었습니다.')
+                return redirect('accounts:update_user_info')
+        elif 'update_password' in request.POST:
+            password_form = UpdatePasswordForm(request.POST)
+            if password_form.is_valid():
+                user = request.user
+                user.set_password(password_form.cleaned_data['password1'])
+                user.save()
+                messages.success(request, '비밀번호가 성공적으로 수정되었습니다.')
+                return redirect('accounts:update_user_info')
+    else:
+        username_form = UpdateUsernameForm(instance=request.user)
+        phone_num_form = UpdatePhoneNumForm(instance=request.user)
+        profile_form = UpdateProfileForm(instance=request.user)
+        password_form = UpdatePasswordForm()
+
+    return render(request, 'accounts/update_user_info.html', {
+        'username_form': username_form,
+        'phone_num_form': phone_num_form,
+        'profile_form': profile_form,
+        'password_form': password_form,
+    })
+
+# 회원탈퇴
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()
+        logout(request)
+        messages.success(request, '회원 탈퇴가 성공적으로 처리되었습니다.')
+        return redirect('home')  # 탈퇴 후 리디렉션할 URL

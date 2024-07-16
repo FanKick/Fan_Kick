@@ -12,4 +12,7 @@ urlpatterns = [
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('update_user_info/', views.update_user_info, name='update_user_info'),
+    path('delete_account/', views.delete_account, name='delete_account'),
+
 ]
