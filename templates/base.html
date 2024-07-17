@@ -111,11 +111,6 @@
             color: white;
         }
 
-        /* 레이아웃체크용 */
-        .main-content .container {
-            background-color: gray;
-        }
-
         .footer {
             height: 380px;
             bottom: 0;
@@ -172,6 +167,12 @@
             color:#828282
         }
 
+        /* 레이아웃체크용 */
+        .main-content .container {
+            background-color: gray;
+        }
+
+
 
 
     </style>
@@ -186,7 +187,7 @@
         <nav>
             <div class = "navbar">
                 <div class = "logo">
-                    <a href = "#"><img src="{% static 'fankick_logo.png' %}" alt="FANKICK LOGO"></a>
+                    <a href = "{% url 'home' %}"><img src="{% static 'fankick_logo.png' %}" alt="FANKICK LOGO"></a>
                 </div>
     
                 <div class = "nav-links">
