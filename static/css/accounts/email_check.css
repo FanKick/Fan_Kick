@@ -1,0 +1,143 @@
+body {
+  background: #E0E0E0;
+}
+
+.container-211 {
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.container-211 h2 {
+  margin-top: 60px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 900; /* 더 두껍게 */
+  font-size: 35px;
+  line-height: 36px;
+  color: #171A1F;
+}
+
+
+.container-211 p {
+  font-size: 22px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28px;
+  color: #171A1F;
+}
+
+.container-211 .form-group {
+  position: absolute;
+  margin-top: 20px;
+  height: 52px;
+}
+
+.container-211 .form-group label {
+  margin-right: 430px;
+  display: block;
+  height: 22px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 22px;
+  color: #424956;
+}
+
+.container-211 .form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+
+.container-211 .button-group {
+  display: flex;
+  flex-direction: column; /* 버튼을 위아래로 배치 */
+  align-items: center;
+  gap: 10px; /* 버튼 사이의 간격 */
+  margin-top: 230px; /* 버튼 그룹의 상단 마진 */
+}
+
+
+.container-211 .btn-primary {
+  width: 359px;
+  height: 50px;
+  left: calc(50% - 359px/2 - 1px);
+  top: 458px;
+  background: linear-gradient(90deg, #060 0%, #6F6 100%);
+  border: none;
+  padding: 10px 40px;
+  font-size: 20px;
+  color: white;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.btn-secondary {
+  background-color:#ffffff;
+  color: #565E6D;
+  padding: 10px 40px;
+  font-size: 20px;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  width: 359px;
+  height: 50px;
+  left: 96px;
+  top: 501.76px;
+  border-radius: 10px;
+  border: none;
+}
+
+
+.container-211 .btn-primary:hover {
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #006600;
+  border-radius: 8px;
+}
+
+.btn-secondary:hover {
+  background-color: #ffffff; /* 호버 시 배경색 유지 */
+  color: #565E6D; /* 호버 시 글자색 유지 */
+  text-decoration: underline; /* 호버 시 밑줄 유지 */
+}
+
+.container-211 .error {
+  color: red;
+  margin-top: 5px;
+}
+
+
+
+.container-211 h4 {
+  margin-top: 30px;
+  font-size: 26px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  color:#060;
+}

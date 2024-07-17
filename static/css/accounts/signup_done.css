@@ -1,0 +1,114 @@
+body {
+  background: #E0E0E0;
+}
+
+.container-211 {
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.container-211 h2 {
+  margin-top: 60px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 900; /* 더 두껍게 */
+  font-size: 35px;
+  line-height: 36px;
+  color: #171A1F;
+}
+
+.container-211 h4 {
+  font-family: 'Pretendard GOV Variable';
+  color: #171A1F;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  margin-top: 30px;
+}
+
+.container-211 p {
+  font-size: 22px;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28px;
+  color: #171A1F;
+}
+
+.container-211 .form-group {
+  position: absolute;
+  margin-top: 20px;
+  height: 52px;
+  left: 96px;
+  right: 96px;
+}
+
+.container-211 .form-group label {
+  margin-right: 430px;
+  display: block;
+  height: 22px;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 22px;
+  color: #424956;
+}
+
+.container-211 .form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+
+.container-211 .btn-primary {
+  position: absolute;
+  width: 359px;
+  height: 50px;
+  left: calc(50% - 359px/2 - 1px);
+  top: 458px;
+  background: linear-gradient(90deg, #060 0%, #6F6 100%);
+  border: none;
+  padding: 10px 40px;
+  font-size: 20px;
+  color: white;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+
+.container-211 .btn-primary:hover {
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #006600;
+  border-radius: 8px;
+}
+
+
+
+.container-211 .error {
+  color: red;
+  margin-top: 5px;
+}

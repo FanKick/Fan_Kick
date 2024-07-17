@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/accounts/email_check.css' %}">
+<div class="container-211">
+  <h2>FANKICK account</h2>
+  <h4>{{ email }}</h4>
+  <p>이 이메일은 새로 가입할 수 있는 이메일입니다.<br>계속하시겠습니까?</p>
+  <div class="button-group">
+    <a href="{% url 'accounts:signup_step2' %}" class="btn btn-primary">가입하기</a>
+    <a href="{% url 'accounts:signup_step1' %}" class="btn btn-secondary">이전</a>
+  </div>
+</div>
+{% endblock %}
