@@ -1,0 +1,234 @@
+.container-297 {
+    width: 100%;
+    height: 100%;
+    padding-top: 10px !important; /* 기존 114px 대신 10px */
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .container-297-inner {
+    width: 80%;  /* 기존 1440px 대신 비율로 변경 */
+    max-width: 1440px;  /* 최대 너비 설정 */
+    height: auto;
+    position: relative;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.container-297 .container-297-post {
+    width: 100%;  /* 702px 대신 100% */
+    margin-bottom: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-297 .container-297-profile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.container-297 .profile-button {
+    width: 44px;
+    height: 44px;
+    padding: 11px;
+    background: #9095A0;
+    border-radius: 22px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.container-297 .profile-icon-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Make it circular */
+    overflow: hidden; /* Ensure the image fits within the circle */
+}
+
+.container-297 .profile-icon-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the entire area */
+}
+
+.container-297 .username-date {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.container-297 .username {
+    color: #171A1F;
+    font-size: 16px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 700;
+    line-height: 26px;
+    margin-right: 10px;
+}
+
+.container-297 .post-date {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .post-date div {
+    padding: 3px 8px;
+    background: #F3F4F6;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .date-text {
+    color: #323842;
+    font-size: 11px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+.container-297 .container-297-post-details {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0; /* Remove left margin */
+}
+
+.container-297 .container-297-post-details p {
+    color: #171A1F;
+    font-size: 15px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 400;
+    line-height: 24px;
+    margin-bottom: 10px;
+}
+
+.container-297 .post-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.container-297 .post-footer {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.container-297 .like-comment-container {
+    display: flex;
+    align-items: center;
+}
+
+.container-297 .count {
+    color: #171A1F;
+    font-size: 14px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    margin-right: 5px;
+}
+
+.container-297 .icon-container {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.container-297 .icon-like,
+.container-297 .icon-comment {
+    width: 15.71px;
+    height: 15px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none; /* 기존의 테두리를 제거합니다. */
+    display: inline-block; /* 이미지를 인라인 블록으로 설정 */
+}
+
+.container-297 .divider {
+    width: 100%;  /* 643px 대신 100% */
+    border: 1px #EAECF0 solid;
+    margin: 20px 0;
+}
+
+.container-297 .empty-space {
+    height: 100px; /* 원하는 높이로 조정 */
+}
+
+/* 기본 이미지 그리드 스타일 */
+.post-images-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.post-image-item {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.post-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 1 / 1; /* 1:1 비율 유지 */
+}
+
+/* 이미지가 3개일 때 */
+.post-images-grid.grid-3 {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.post-images-grid.grid-3 .post-image-item:nth-child(1) {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+}
+
+.post-images-grid.grid-3 .post-image-item:nth-child(2) {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+.post-images-grid.grid-3 .post-image-item:nth-child(3) {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+}
+
+/* 이미지가 2개일 때 */
+.post-images-grid.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.post-images-grid.grid-2 .post-image-item:nth-child(1) {
+    grid-column: 1 / 2;
+}
+
+.post-images-grid.grid-2 .post-image-item:nth-child(2) {
+    grid-column: 2 / 3;
+}
+
+/* 이미지가 1개일 때 */
+.post-images-grid.grid-1 {
+    grid-template-columns: 1fr;
+}
+
+.post-images-grid.grid-1 .post-image-item {
+    grid-column: 1 / 2;
+}
