@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/accounts/update_user_info.css' %}">
+<div class="main-content">
+    <div class="user-info-container">
+        <div class="user-info-sidebar">
+          <ul class="user-info-menu">
+            <li><a href="{% url 'accounts:update_user_info' %}" class="btn-user-info"><i class="fas fa-user"></i> 회원정보</a></li>
+            <li><a href="#" class="btn-subscription"><i class="fas fa-bell"></i> 구독관리</a></li>
+            <li><a href="#" class="btn-community"><i class="fas fa-users"></i> 커뮤니티 관리</a></li>
+          </ul>
+        </div>
+
+        <div class="user-info-content">
+            <h2>나의 정보</h2>
+
+            <div class="profile-section">
+                <h3>Profile</h3>
+                {% if user.profile %}
+                <img id="current-profile-pic" src="{{ user.profile.url }}" alt="프로필 사진" class="profile-pic">
+            {% else %}
+                <img id="current-profile-pic" src="{% static 'default-profile.png' %}" alt="기본 프로필 사진" class="profile-pic">
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" class="form-inline">
+                {% csrf_token %}
+                <label for="file-upload" class="custom-file-upload" style="margin-right: 20px; margin-top: 8px;" >
+                    파일 선택
+                </label>
+                <input id="file-upload" type="file" name="profile">
+                {{ profile_form.profile.errors }}
+                <button type="submit" name="update_profile" class="btn" style="margin-top: 8px;">변경</button>
+            </form>
+            </div>
+
+            <div class="email-section">
+                <h3>Email</h3>
+                <p class="user-email">{{ user.email }}</p>
+              </div>
+
+            <div class="username-section">
+                <h3>Nickname</h3>
+                <form method="post" class="form-inline">
+                    {% csrf_token %}
+                    {{ username_form.username }}
+                    <button type="submit" name="update_username" class="btn">변경</button>
+                </form>
+            </div>
+
+            <div class="phone-section">
+                <h3>Phone Number</h3>
+                <form method="post" class="form-inline">
+                    {% csrf_token %}
+                    {{ phone_num_form.phone_num }}
+                    <button type="submit" name="update_phone_num" class="btn">변경</button>
+                </form>
+            </div>
+
+            <div class="password-section">
+                <h3>PW</h3>
+                <form method="post" class="form-inline">
+                    {% csrf_token %}
+                    {{ password_form.as_p }}
+                    <button type="submit" name="update_password" class="btn">변경</button>
+                </form>
+            </div>
+            <div class="delete-account-section">
+              <button type="button" class="btn btn-danger" id="open-modal">회원탈퇴</button>
+          </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 모달 창 HTML 구조 -->
+<div id="delete-modal" class="modal">
+  <div class="modal-content">
+      <span class="close">&times;</span>
+      <p>정말로 회원 탈퇴를 하시겠습니까?</p>
+      <form method="post" action="{% url 'accounts:delete_account' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">확인</button>
+          <button type="button" class="btn btn-secondary" id="close-modal">취소</button>
+      </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById('file-upload').addEventListener('change', function(event) {
+      const [file] = event.target.files;
+      if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              const currentProfilePic = document.getElementById('current-profile-pic');
+              currentProfilePic.src = e.target.result;
+              currentProfilePic.classList.remove('hidden');
+          }
+          reader.readAsDataURL(file);
+      }
+  });
+
+
+    // Get the modal
+    var modal = document.getElementById("delete-modal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("open-modal");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // Get the cancel button that closes the modal
+    var cancelBtn = document.getElementById("close-modal");
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x) or the cancel button, close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    cancelBtn.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+</script>
+{% endblock %}
