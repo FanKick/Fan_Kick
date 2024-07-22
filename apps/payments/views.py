@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 ## test 하려고 만든 함수
 def pay_home(request):
     players = Player.objects.all()
-    return render(request, 'payments/pay_home.html', 
+    return render(request, 'payments/payment_home.html', 
         {
             'players' : players,
         }
@@ -34,7 +34,7 @@ def subsctiption_pay(request,pk):
         # return redirect("payments:payment_detail", pk=pk)
         raise Http404("현재 유효한 구독이 있습니다")
     
-    payment = SubscriptionPayment.create_by_payment(player, subscriber, '구독권')
+    payment = SubscriptionPayment.create_by_payment(player, subscriber, 'Basic Plan')
 
     payment_props = {
         'pg': 'kakaopay',
