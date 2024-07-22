@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+{% load static %}
+{% load user_tags %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'contents/contents_navbar.css' %}">
+<link rel="stylesheet" href="{% static 'contents/user_feed.css' %}">
+<link rel="stylesheet" href="{% static 'contents/create_post.css' %}">
+<link rel="stylesheet" href="{% static 'contents/modal.css' %}">
+<link rel="stylesheet" href="{% static 'contents/post_modal.css' %}">
+
+<div class="container-navbar">
+    <div class="nav-item">
+        <a href="{% url 'user_post_list' team.id %}" class="{% if request.path == '/contents/team/'|add:team.id|add:'/user_post_list/' %}active{% endif %}">Feed</a>
+    </div>
+    <div class="nav-item">
+        <a href="{% url 'player_post_list' team.id %}" class="{% if request.path == '/contents/team/'|add:team.id|add:'/player_post_list/' %}active{% endif %}">Player</a>
+    </div>
+</div>
+
+<!-- Hidden input for team ID -->
+<input type="hidden" id="team-id" value="{{ team.id }}">
+
+<!-- 피드 작성란 -->
+<div class="container-298 post-create-container">
+    {% if request.user.is_authenticated and request.user|user_is_role:'user' %}
+    <div class="container-298 post-create-input" id="post-create-input">
+        <div class="container-298 profile-button">
+            <div class="container-298 profile-icon">
+                <img src="{% if request.user.profile %}{{ request.user.profile.url }}{% else %}{% static 'contents/Frame.png' %}{% endif %}" alt="Profile Image" class="container-298 profile-icon-inner">
+            </div>
+        </div>
+        <div class="container-298 post-create-text">
+            <input type="text" placeholder="자신의 포스트를 남겨보세요." class="container-298 post-create-input-field">
+            <div class="container-298 post-create-icon">
+                <img src="{% static 'contents/Image.png' %}" alt="Post Icon" class="post-icon">
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-space"></div>  <!-- 여백 추가 -->
+    {% endif %}
+</div>
+
+<!-- Create Post 모달 -->
+<div class="modal hidden" id="post-create-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">포스트 쓰기</div>
+            <div class="modal-close-button" id="modal-close-create">
+                <img src="{% static 'contents/E remove.png' %}" alt="Close Icon" class="modal-close-icon">
+            </div>
+        </div>
+        <div class="modal-username">
+            <div class="modal-username-inner">
+                <div class="modal-username-text">{{ request.user.username }}</div>
+            </div>
+        </div>
+        <div class="modal-editor-container" id="modal-editor-container">
+            <textarea class="modal-editor" id="modal-editor" placeholder="팬픽에 남겨보세요..."></textarea>
+        </div>
+        <!-- 파일 정보 표시 영역 -->
+        <div class="file-info" id="file-info"></div>
+        
+        <div class="modal-divider"></div>
+        <button type="button" class="modal-button" id="modal-submit-button">
+            <div class="modal-button-text">등록</div>
+        </button>
+        <div class="modal-img-button" id="modal-img-button">
+            <img src="{% static 'contents/Image.png' %}" alt="Cancel Button">
+        </div>
+        
+        <!-- 이미지 파일 입력 필드 -->
+        <input type="file" id="image-input" class="hidden" accept="image/*" multiple>
+    </div>
+</div>
+
+<!-- 포스트와 팀 섹션 -->
+<div class="container-297">
+    <div class="container-297-inner">
+        <!-- 기존 포스트들 -->
+        {% for post in posts %}
+        <div class="container-297-post">
+            <div class="container-297-profile">
+                <div class="profile-button">
+                    <div class="profile-icon">
+                        {% if post.user.profile %}
+                            <!-- Assume all profiles are stored in media/profiles -->
+                            <img src="/media/profiles/{{ post.user.profile.name }}" alt="Profile Image" class="container-297 profile-icon-inner">
+                        {% else %}
+                            <img src="{% static 'contents/Frame.png' %}" alt="Profile Image" class="container-297 profile-icon-inner">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="username-date">
+                    <div class="username">{{ post.user.username }}</div>
+                    <div class="post-date">
+                        <div class="date-text">{{ post.created_at|date:"m.d H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-297-post-details" data-post-id="{{ post.id }}">
+                <p>{{ post.content }}</p>
+                {% if post.images.exists %}
+                <ul class="post-images-grid" data-image-count="{{ post.images.count }}">
+                    {% for image in post.images.all %}
+                    <li class="post-image-item"><img class="post-image" src="{{ image.image_url.url }}" /></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="post-footer">
+                    <div class="like-comment-container">
+                        <div class="icon-container">
+                            <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="icon-like">
+                        </div>
+                        <div class="count">{{ post.likes.count }}</div>
+                        <div class="icon-container">
+                            <img src="{% static 'contents/comment.png' %}" alt="Comment Icon" class="icon-comment">
+                        </div>
+                        <div class="count">{{ post.comments.count }}</div>
+                    </div>
+                </div>
+                <div class="divider"></div> <!-- 각 포스트 사이의 구분선 -->
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 오른쪽 팀 섹션 -->
+    <div class="container-297-team">
+        <img src="{{ team.team_picture.url }}" alt="Team Image" class="team-image">
+        <div class="fc-seoul-badge">
+            <span class="fc-seoul-text">{{ team.team_name }}</span>
+        </div>
+        <a href="#" class="community-button" id="join-community" data-team-id="{{ team.id }}">
+            <span class="community-button-text">커뮤니티 가입하기</span>
+        </a>
+    </div>
+</div>
+
+<!-- Post Detail 모달 -->
+<div id="postModal" class="post_modal modal">
+    <div class="modal-content">
+        <span class="close" id="modal-close-detail">&times;</span>
+        <div class="modal-left">
+            <div id="postModalContent"></div>
+        </div>
+        <div class="modal-right">
+            <div id="commentsContainer">
+                <ul id="commentsList"></ul>
+            </div>
+            <form id="commentForm">
+                <textarea id="commentText" placeholder="댓글을 입력하세요..."></textarea>
+                <button type="button" id="submitComment">댓글 등록</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    var createModal = document.getElementById('post-create-modal');
+    var createInputField = document.getElementById('post-create-input');
+    var createCloseBtn = document.getElementById('modal-close-create');
+    var createImgBtn = document.getElementById('modal-img-button');
+    var createImageInput = document.getElementById('image-input');
+    var createFileInfo = document.getElementById('file-info');
+    var createSubmitBtn = document.getElementById('modal-submit-button');
+    var joinButton = document.getElementById('join-community');
+
+    var detailModal = document.getElementById('postModal');
+    var detailCloseBtn = document.getElementById('modal-close-detail');
+    var postModalContent = document.getElementById('postModalContent');
+    var commentsContainer = document.getElementById('commentsContainer');
+    var submitComment = document.getElementById('submitComment');
+
+    // Create Post 모달 로직
+    createModal.classList.add('hidden');
+    createModal.style.display = "none";  // 모달을 숨김
+
+    if (createInputField) {
+        createInputField.addEventListener('click', function() {
+            createModal.classList.remove('hidden');
+            createModal.style.display = "flex";  // 모달을 표시
+        });
+    }
+
+    if (createCloseBtn) {
+        createCloseBtn.addEventListener('click', function() {
+            createModal.classList.add('hidden');
+            createModal.style.display = "none";  // 모달을 숨김
+        });
+    }
+
+    if (createImgBtn) {
+        createImgBtn.addEventListener('click', function() {
+            createImageInput.click();  // 파일 선택 창을 엽니다.
+        });
+    }
+
+    createImageInput.addEventListener('change', function() {
+        var files = createImageInput.files;
+        if (files.length > 3) {
+            alert("최대 3개의 이미지만 선택할 수 있습니다.");
+            createImageInput.value = "";  // 파일 선택 초기화
+        } else {
+            displayFileInfo(files);
+        }
+    });
+
+    function displayFileInfo(files) {
+        createFileInfo.innerHTML = '';  // 기존 파일 정보 초기화
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var fileElement = document.createElement('div');
+            fileElement.textContent = file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
+            createFileInfo.appendChild(fileElement);
+        }
+    }
+
+    createSubmitBtn.addEventListener('click', function() {
+        var formData = new FormData();
+        formData.append('content', document.getElementById('modal-editor').value);
+        
+        var files = createImageInput.files;
+        for (var i = 0; i < files.length; i++) {
+            formData.append('images', files[i]);
+        }
+
+        formData.append('team_id', document.getElementById('team-id').value);
+
+        fetch("{% url 'create_post_user' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                createModal.classList.add('hidden');
+                createModal.style.display = "none";  // 모달을 숨김
+                location.reload();  // 페이지를 새로고침하여 새로운 포스트를 표시
+            } else {
+                alert('포스트 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target === createModal) {
+            createModal.classList.add('hidden');
+            createModal.style.display = "none";  // 모달을 숨김
+        }
+    });
+
+    // 이미지 개수에 따라 그리드 클래스 추가
+    var imageGrids = document.querySelectorAll('.post-images-grid');
+    imageGrids.forEach(function(grid) {
+        var imageCount = grid.getAttribute('data-image-count');
+        if (imageCount == 1) {
+            grid.classList.add('grid-1');
+        } else if (imageCount == 2) {
+            grid.classList.add('grid-2');
+        } else if (imageCount == 3) {
+            grid.classList.add('grid-3');
+        } else if (imageCount > 3) {
+            grid.classList.add('grid-4');
+        }
+    });
+
+    // Post Detail 모달 로직
+    document.querySelectorAll('.container-297-post-details').forEach(postDetail => {
+        postDetail.addEventListener('click', function() {
+            var postId = postDetail.getAttribute('data-post-id');
+            fetch(`/contents/post_detail/${postId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    postModalContent.innerHTML = `
+                        <div class="post-modal-content">
+                            <h3>${data.username}</h3>
+                            <p>${data.content}</p>
+                            <ul class="post-images-grid" data-image-count="${data.images.length}">
+                                ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image"></li>`).join('')}
+                            </ul>
+                            <p>Likes: ${data.likes_count}</p>
+                            <p>User has liked: ${data.user_has_liked}</p>
+                        </div>
+                    `;
+
+                    var commentsHTML = data.comments.map(comment => `
+                        <li>
+                            <strong>${comment.username}</strong>: ${comment.content}
+                        </li>
+                    `).join('');
+                    commentsContainer.querySelector('ul').innerHTML = commentsHTML;
+
+                    // 이미지 개수에 따라 그리드 클래스 추가
+                    var postImagesGrid = postModalContent.querySelector('.post-images-grid');
+                    var postImageCount = postImagesGrid.getAttribute('data-image-count');
+                    if (postImageCount == 1) {
+                        postImagesGrid.classList.add('grid-1');
+                    } else if (postImageCount == 2) {
+                        postImagesGrid.classList.add('grid-2');
+                    } else if (postImageCount == 3) {
+                        postImagesGrid.classList.add('grid-3');
+                    } else if (postImageCount > 3) {
+                        postImagesGrid.classList.add('grid-4');
+                    }
+
+                    detailModal.setAttribute('data-post-id', postId); // 모달에 post_id 설정
+                    detailModal.style.display = 'block';
+                });
+        });
+    });
+
+    detailCloseBtn.addEventListener('click', function() {
+        detailModal.style.display = 'none';
+    });
+
+    submitComment.addEventListener('click', function() {
+        var postId = detailModal.getAttribute('data-post-id');
+        var commentText = document.getElementById('commentText').value.trim(); // 댓글 내용을 가져옵니다.
+        
+        if (!commentText) {
+            alert('댓글 내용을 입력하세요.');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('content', commentText); // 댓글 내용을 FormData에 추가합니다.
+
+        fetch(`/contents/post_detail/${postId}/add_comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var newComment = document.createElement('li');
+                newComment.innerHTML = `<strong>${data.username}</strong>: ${data.content}`;
+                commentsContainer.querySelector('ul').appendChild(newComment);
+                document.getElementById('commentText').value = '';
+            } else {
+                alert('댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    });
+
+
+    window.addEventListener('click', function(event) {
+        if (event.target === detailModal) {
+            detailModal.style.display = 'none';
+        }
+    });
+
+    // 커뮤니티 가입하기 버튼 클릭 시 AJAX 요청을 보냅니다.
+    if (joinButton) {
+        joinButton.addEventListener('click', function() {
+            var teamId = joinButton.getAttribute('data-team-id');
+            var formData = new FormData();
+            formData.append('team_id', teamId);
+
+            fetch("{% url 'join_team' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('팀에 가입되었습니다.');
+                    location.reload();
+                } else {
+                    alert('팀 가입에 실패했습니다. ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}
