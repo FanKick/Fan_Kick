@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/accounts/signup_step2.css' %}">
+<div class="container-211">
+  <h2>FANKICK account</h2>
+  <h4>새 비밀번호를 설정해주세요</h4>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+      {% if form.password1.errors %}
+        <div class="error">
+          {% for error in form.password1.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <p class="password-conditions">
+      8~32자<br>
+      영문 1글자 이상<br>
+      1글자 이상 숫자<br>
+      1글자 이상 특수문자
+    </p>
+    <div class="form-group">
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        <div class="error">
+          {% for error in form.password2.errors %}
+            <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="button-group">
+      <button type="submit" class="btn btn-primary">다음</button>
+      <a href="{% url 'accounts:email_check' %}" class="btn btn-secondary">이전</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+{% for player in players %}
+<a href="{% url 'payments:subsctiption_pay' pk=player.id %}">
+    <h2>{{player.player_name}}</h2>
+    {% if player.user.profile %}
+        <img src="{{ player.user.profile.url }}" alt="{{ player.player_name }}'s profile picture" style="width: 100px; height: auto;">
+    {% else %}
+        <p>No profile picture available.</p>
+    {% endif %}    
+</a>
+{% endfor %}
+
+{% endblock content %}

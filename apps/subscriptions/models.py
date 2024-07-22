@@ -21,18 +21,24 @@ class SubscriptionPlan(models.Model):
 class Subscription(models.Model):
     subscriber = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='subscriptions')
     subscribed_to_player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='subscribers')
-    plan_id = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name='subscription_plan')
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name='subscription_plan')
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField()
     status = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        self.end_date = self.start_date + timezone.timedelta(days=self.plan_id.duration)
+        self.end_date = self.start_date + timezone.timedelta(days=self.plan.duration)
         super().save(*args, **kwargs)
+    
+    @classmethod
+    def has_active_subscription(cls, subscriber, player):
+        return cls.objects.filter(
+            subscriber=subscriber, 
+            subscribed_to_player=player, 
+            status=True,
+            end_date__gte=timezone.now()
+        ).exists()
 
-    def is_active_subscription(self):
-        today = timezone.now().date()
-        return self.start_date <= today <= self.end_date
 
     def __str__(self):
         return f'Subscription #{self.id} - {self.subscriber.username} to {self.subscribed_to_player.player_name}'

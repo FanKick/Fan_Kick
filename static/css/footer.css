@@ -1,0 +1,58 @@
+.footer {
+    height: 380px;
+    background-color: #fff;
+    width: 100%;  /* 너비를 100%로 설정 */
+    bottom: 0;
+}
+
+
+.footer-top {
+    height: 30px;
+    background: linear-gradient(90deg, #060 0%, #6F6 100%);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    top: 0;
+}
+
+.footer .footer-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.footer .top-section,
+.footer .bottom-section {
+    padding: 30px 150px 0 150px; /* 상우하좌 */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer .top-section .left-column,
+.footer .bottom-section .left-column {
+    flex: 2;
+    padding-right: 100px;
+}
+
+.footer .top-section .right-column,
+.footer .bottom-section .right-column {
+    flex: 1;
+    padding-left: 20px;
+}
+
+.bottom-section .right-column,
+.bottom-section .left-column {
+    border-top: solid 1px #E0E0E0;
+}
+
+.footer .logo img {
+    height: 50px;
+}
+
+.git-link {
+    font-size: 16px;
+    color: #000000
+}
+
+.git-link:hover {
+    color:#828282
+}

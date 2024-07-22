@@ -25,11 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-#포트원
-PORTONE_SHOP_ID = os.getenv("PORTONE_SHOP_ID")
-PORTONE_API_KEY = os.getenv("PORTONE_API_KEY")
-PORTONE_API_SECRET = os.getenv("PORTONE_API_SECRET")
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -45,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
+    'django_extensions',
     'apps.accounts',
     'apps.alert',
     'apps.chattings',
@@ -64,7 +61,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# Debug Toolbar 설정
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
 
 ROOT_URLCONF = 'config.urls'
 
@@ -150,3 +157,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+# 이메일 관련 설정
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.naver.com'  # SMTP 호스트
+EMAIL_PORT = 587  # SMTP 포트
+EMAIL_USE_TLS = True  # TLS 보안 설정
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_ID")  # 이메일 사용자
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # 이메일 비밀번호
+
+# 이메일 인증 관련 설정
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # 보내는 사람 이메일 주소
+
+#포트원
+PORTONE_SHOP_ID = os.getenv("PORTONE_SHOP_ID")
+PORTONE_API_KEY = os.getenv("PORTONE_API_KEY")
+PORTONE_API_SECRET = os.getenv("PORTONE_API_SECRET")
+
+# 세션 엔진 설정
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+SITE_URL = 'http://localhost:8000'
