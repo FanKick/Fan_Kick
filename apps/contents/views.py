@@ -193,10 +193,11 @@ def join_team(request):
 
 
 @login_required
+@csrf_exempt
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if not Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists():
-        return HttpResponseForbidden("You are not a member of this team.")
+        return JsonResponse({'success': False, 'error': 'You are not a member of this team.'}, status=403)
     
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
@@ -205,14 +206,13 @@ def add_comment(request, post_id):
             comment.user = request.user
             comment.post = post
             comment.save()
-            return redirect('post_detail', pk=post.id)
-    else:
-        comment_form = CommentForm()
+            return JsonResponse({'success': True, 'username': comment.user.username, 'content': comment.content})
+        else:
+            return JsonResponse({'success': False, 'errors': comment_form.errors.as_json()})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
-    return render(request, 'contents/post_detail.html', {
-        'post': post,
-        'comment_form': comment_form,
-    })
+
 
 @login_required
 def add_like(request, post_id):

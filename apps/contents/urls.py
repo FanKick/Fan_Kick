@@ -8,4 +8,5 @@ urlpatterns = [
     path('create_post/player/', views.create_post_player, name='create_post_player'),
     path('create_post/user/', views.create_post_user, name='create_post_user'),
     path('join_team/', views.join_team, name='join_team'),
+     path('post_detail/<int:post_id>/add_comment/', views.add_comment, name='add_comment'),  # add_comment 경로 추가
 ]
