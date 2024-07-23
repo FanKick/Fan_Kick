@@ -201,12 +201,12 @@ class UpdatePasswordForm(forms.Form):
     password1 = forms.CharField(
         label='새로운 비밀번호',
         strip=False,
-        widget=forms.PasswordInput(attrs={'placeholder': '새로운 비밀번호', 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         required=True
     )
     password2 = forms.CharField(
         label='새로운 비밀번호 확인',
-        widget=forms.PasswordInput(attrs={'placeholder': '새로운 비밀번호 확인', 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         required=True
     )
 

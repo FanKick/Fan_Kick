@@ -1,38 +1,9 @@
-body {
-  background: #E0E0E0;
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* Ensure the wrapper takes full height */
-  min-height: 100%;
-  padding-bottom: 0px; /* Footer height */
-}
-
-.main-content {
-  flex-grow: 1; /* Allow main-content to grow and fill available space */
-  display: flex;
-  justify-content: center; /* Center content horizontally */
-  align-items: center; /* Center content vertically */
-}
-
-.main-content .container {
-  background: #E0E0E0;
-  max-width: 100%;
-  max-height: 100%;
-}
-
 .main-content .user-info-container {
-  position: relative;
+  background: #E0E0E0;
   display: flex; /* Use Flexbox */
-  width: 60vw; /* Viewport width */
-  height: auto; /* Adjust height as needed */
-  margin: 0 auto; /* Center horizontally */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  justify-content: flex-start; /* Align items to the start */
-  align-items: flex-start; /* Align items to the top */
+  justify-content:center; /* Align items to the start */
   gap: 50px; /* Add gap between sidebar and content */
+  padding: 100px 200px;
 }
 
 .user-info-sidebar {
@@ -41,27 +12,76 @@ body {
   padding: 15px;
 }
 
+/*사이드바 */
+.user-info-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-info-menu li {
+  margin-bottom: 10px; /* Add some spacing between buttons */
+}
+
+/* 회원정보 버튼 스타일 */
+.btn-user-info,
+.btn-subscription,
+.btn-community
+ {
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  color: #000;
+  background: #FFFFFF;
+  padding: 10px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: flex; /* Use flexbox */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  text-align: center;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  width: 300px;
+  height: 70px;
+  gap: 10px;
+}
+
+/* ... existing code ... */
+
+.btn-user-info:hover,
+.btn-subscription:hover,
+.btn-community:hover {
+  color:#006600; /* Change text color to blue on hover */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+/* ... existing code ... */
+
+.btn-user-info i,
+.btn-subscription i,
+.btn-community i {
+  margin-right: 10px; /* Add margin to the right of the icon */
+}
+
+/*회원정보수정*/
 .user-info-content {
-  width: 600px;
   flex-grow: 1;
-  padding: 50px 130px; /* Add padding to the left and right */
+  padding: 50px 100px; /* Add padding to the left and right */
   background: #FFFFFF;
   border-radius: 8px;
   display: flex; /* Add Flexbox */
   flex-direction: column; /* Ensure content stacks vertically */
-  justify-content: flex-start; /* Align content to the top */
-  align-items: flex-start; /* Align content to the left */
 }
 
 .user-info-content h2 {
   font-family: 'Pretendard GOV Variable';
   font-style: normal;
   font-weight: 700;
-  font-size: 30px;
-  line-height: 30px; /* identical to box height, or 125% */
+  font-size: 25px;
+  line-height: 25px; /* identical to box height, or 125% */
   color: #171A1F;
-  margin-top: 20px;
-  margin-bottom: 20px; /* Adjust the bottom margin to control spacing */
 }
 
 .profile-section,
@@ -69,7 +89,7 @@ body {
 .username-section,
 .phone-section,
 .password-section {
-  margin-bottom: 40px; /* Add bottom margin to each section */
+  margin-bottom: 20px; /* Add bottom margin to each section */
 }
 
 .profile-section h3,
@@ -80,23 +100,17 @@ body {
   font-family: 'Pretendard GOV Variable';
   font-style: normal;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 23px;
   line-height: 30px; /* identical to box height, or 125% */
   color: #171A1F;
   margin-top: 10px;
-  margin-bottom: 10px; /* Adjust the bottom margin to control spacing */
+  margin-bottom: 5px; /* Adjust the bottom margin to control spacing */
 }
 
-.form-inline {
+.password-section .form-inline {
   display: flex;
   align-items: center;
-}
-
-.form-inline input[type="text"],
-.form-inline input[type="password"],
-.form-inline input[type="file"],
-.form-inline button {
-  margin-right: 10px; /* Add margin to the right of each input and button */
+  gap: 20px;
 }
 
 .profile-pic {
@@ -121,6 +135,11 @@ input[type="file"] {
   border: 1px solid #ccc;
   font-family: 'Pretendard GOV Variable';
   border-radius: 4px;
+  font-size: 14px;
+}
+
+.custom-file-upload:hover {
+  background-color: #f0f0f0;
 }
 
 .btn {
@@ -152,28 +171,6 @@ input[type="file"] {
   border: none; /* Remove border */
 }
 
-/* ... existing code ... */
-
-.btn:focus,
-.btn:active {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* ... existing code ... */
-
-.custom-file-upload:hover {
-  background-color: #f0f0f0;
-}
-
-.password-section input[type="password"] {
-  width: 300px; /* Adjust the width as needed */
-  max-width: 100%; /* Ensure it doesn't exceed the container's width */
-  padding: 10px; /* Optional: Add padding for better appearance */
-  border: 1px solid #ccc; /* Optional: Add border */
-  border-radius: 4px; /* Optional: Add border radius */
-}
-
 .user-email {
   font-family: 'Pretendard GOV Variable';
   font-style: normal;
@@ -189,14 +186,27 @@ input[type="file"] {
   display: none;
 }
 
+.password-section input[type="password"] {
+  width: 150px; /* Adjust the width as needed */
+  max-width: 100%; /* Ensure it doesn't exceed the container's width */
+  padding: 8px; /* Optional: Add padding for better appearance */
+  border: 1px solid #ccc; /* Optional: Add border */
+  border-radius: 4px; /* Optional: Add border radius */
+}
+
+.delete-account-section {
+  display: flex; /* Use Flexbox */
+  justify-content: flex-end; /* Align items to the right */
+  position: relative;
+}
+
 .btn-danger {
   box-sizing: border-box;
   font-family: 'Pretendard GOV Variable';
   font-style: normal;
   font-weight: 400;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 22px;
-  text-align: right;
   background-color: #ffffff;
   color : #EA3838;
   cursor: pointer; /* Add pointer cursor */
@@ -204,17 +214,21 @@ input[type="file"] {
   border: 1px solid #EA3838;
   border-radius: 8px;
   transition: color 0.3s ease; /* Smooth transition for color change */
+  padding: 8px;
 }
 
 .btn-danger:hover {
   color: #ffffff; /* Show text color on hover */
   background-color: #EA3838;
+  box-sizing: border-box;
+  font-family: 'Pretendard GOV Variable';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
 }
-.delete-account-section {
-  position: absolute;
-  bottom: 40px; /* Distance from the bottom */
-  right: 70px; /* Distance from the right */
-}
+
+
 
 /* 모달 창 스타일 */
 .modal {
@@ -243,7 +257,7 @@ input[type="file"] {
 }
 
 .close {
-  color: #aaa;
+  color: #070707;
   position: absolute;
   top: 10px;
   right: 10px;
@@ -263,65 +277,12 @@ input[type="file"] {
   background-color: #ccc;
   color: #000;
   border: none;
-  padding: 10px 20px;
+  padding: 8px;
   border-radius: 8px;
   cursor: pointer;
-  margin-left: 10px;
 }
 
 .btn-secondary:hover {
   background-color: #bbb;
-}
-
-/*사이드바 */
-.user-info-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.user-info-menu li {
-  margin-bottom: 10px; /* Add some spacing between buttons */
-}
-
-/* 회원정보 버튼 스타일 */
-.btn-user-info,
-.btn-subscription,
-.btn-community
- {
-  font-family: 'Pretendard GOV Variable';
-  font-style: normal;
-  font-weight: 700;
-  font-size: 23px;
   color: #000;
-  background: #FFFFFF;
-  padding: 10px 10px;
-  border-radius: 8px;
-  text-decoration: none;
-  display: flex; /* Use flexbox */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  text-align: center;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  width: 313px;
-  height: 75px;
-  gap: 10px;
-}
-
-/* ... existing code ... */
-
-.btn-user-info:hover,
-.btn-subscription:hover,
-.btn-community:hover {
-  color:#006600; /* Change text color to blue on hover */
-  text-decoration: underline; /* Add underline on hover */
-}
-
-/* ... existing code ... */
-
-.btn-user-info i,
-.btn-subscription i,
-.btn-community i {
-  margin-right: 10px; /* Add margin to the right of the icon */
 }
