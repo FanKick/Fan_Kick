@@ -1,0 +1,303 @@
+.container-297 {
+    width: 100%;
+    height: 100%;
+    padding-top: 10px !important; /* 기존 114px 대신 10px */
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .container-297-inner {
+    width: 80%;
+    max-width: 1440px;
+    height: auto;
+    position: relative;
+    background: white;
+    display: flex;
+    flex-direction: column; /* Posts will be displayed in a column */
+    justify-content: flex-start; /* Start from the top */
+}
+
+.container-297 .container-297-post {
+    width: 70%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-297 .container-297-space {
+    width: 10%; /* 빈 공간의 너비 */
+}
+
+.container-297 .container-297-team {
+    width: 20%;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100vh; /* 전체 높이를 화면 높이에 맞추기 */
+}
+
+.container-297 .container-297-profile {
+    width: auto; /* 변경: 유동적인 너비로 설정 */
+    height: 46px; /* 높이를 줄임 */
+    display: flex; /* 추가: flex를 사용하여 내부 요소들을 수평으로 정렬 */
+    align-items: center;
+    margin-bottom: 20px; /* margin-right를 제거하고 margin-bottom을 추가 */
+}
+
+.container-297 .profile-icon {
+    width: 46px; /* 프로필 아이콘의 고정 너비 */
+    height: 46px;
+    margin-right: 10px; /* 아이콘과 텍스트 사이의 간격 조정 */
+}
+
+.container-297 .profile-button {
+    width: 44px;
+    height: 44px;
+    padding: 11px;
+    background: #9095A0;
+    border-radius: 22px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.container-297 .profile-icon-inner {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.container-297 .profile-icon-line1,
+.container-297 .profile-icon-line2 {
+    border: 1.32px white solid;
+}
+
+.container-297 .container-297-post-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.container-297 .username-date {
+    display: flex;
+    flex-direction: column; /* 수직 정렬 */
+    justify-content: center;
+}
+
+.container-297 .username {
+    color: #171A1F;
+    font-size: 16px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 700;
+    line-height: 26px;
+}
+
+.container-297 .post-date {
+    width: auto;
+    height: 24px;
+    background: rgba(0, 0, 0, 0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .post-date div {
+    padding: 3px 8px; /* 기존 패딩 유지 */
+    background: #F3F4F6;
+    border-radius: 12px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.container-297 .date-text {
+    color: #323842;
+    font-size: 11px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+.container-297 .container-297-post-details p {
+    width: 100%;
+    color: #171A1F;
+    font-size: 15px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 400;
+    line-height: 24px;
+    margin-bottom: 10px;
+}
+
+.container-297 .post-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.container-297 .post-footer {
+    width: 132px;
+    height: 23px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.container-297 .like-comment-container {
+    display: flex;
+    align-items: center;
+}
+
+.container-297 .count {
+    color: #171A1F;
+    font-size: 14px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    margin-right: 5px;
+}
+
+.container-297 .icon-container {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.container-297 .icon-like,
+.container-297 .icon-comment {
+    width: 15.71px;
+    height: 15px;
+    border: 1.71px #171A1F solid;
+}
+
+.container-297 .divider {
+    width: 100%;
+    border: 1px #EAECF0 solid;
+    margin: 20px 0;
+}
+
+/* 팀 이미지 스타일 */
+.container-297 .team-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* FC 서울 배지 스타일 */
+.container-297 .fc-seoul-badge {
+    padding: 12px 39px;
+    background: linear-gradient(90deg, #006600 0%, #66FF66 100%);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .fc-seoul-text {
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 700;
+    line-height: 28px;
+}
+
+/* 커뮤니티 버튼 스타일 */
+.container-297 .community-button {
+    padding: 10px 30px; /* FC 서울 버튼보다 살짝 작게 조정 */
+    background: linear-gradient(90deg, #006600 0%, #66FF66 100%);
+    border-radius: 100px;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    margin-top: auto; /* 자동으로 아래쪽에 위치 */
+}
+
+.container-297 .community-button-text {
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    font-family: 'Pretendard GOV Variable';
+    font-weight: 700;
+    line-height: 28px;
+}
+
+/* 여백 추가를 위한 스타일 */
+.container-297 .empty-space {
+    height: 100px; /* 원하는 높이로 조정 */
+}
+
+/* 기본 이미지 그리드 스타일 */
+.post-images-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.post-image-item {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.post-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 1 / 1; /* 1:1 비율 유지 */
+}
+
+/* 이미지가 3개일 때 */
+.post-images-grid.grid-3 {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.post-images-grid.grid-3 .post-image-item:nth-child(1) {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+}
+
+.post-images-grid.grid-3 .post-image-item:nth-child(2) {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+.post-images-grid.grid-3 .post-image-item:nth-child(3) {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+}
+
+/* 이미지가 2개일 때 */
+.post-images-grid.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.post-images-grid.grid-2 .post-image-item:nth-child(1) {
+    grid-column: 1 / 2;
+}
+
+.post-images-grid.grid-2 .post-image-item:nth-child(2) {
+    grid-column: 2 / 3;
+}
+
+/* 이미지가 1개일 때 */
+.post-images-grid.grid-1 {
+    grid-template-columns: 1fr;
+}
+
+.post-images-grid.grid-1 .post-image-item {
+    grid-column: 1 / 2;
+}

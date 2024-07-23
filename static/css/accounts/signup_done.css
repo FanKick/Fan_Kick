@@ -1,15 +1,22 @@
+.main-content {
+  background: #E0E0E0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  height: 100vh;
+}
+
 .container-211 {
-  position: fixed;
+  position: relative;
   width: 700px;
   height: 700px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   background: #ffffff;
   border-radius: 8px;
   padding: 20px;
   box-sizing: border-box;
   text-align: center;
+  align-items: center;
 }
 
 .container-211 h2 {
@@ -76,7 +83,7 @@
   position: absolute;
   width: 359px;
   height: 50px;
-  left: calc(50% - 359px/2 - 1px);
+  left: calc(20%);
   top: 458px;
   background: linear-gradient(90deg, #060 0%, #6F6 100%);
   border: none;

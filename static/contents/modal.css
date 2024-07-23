@@ -1,0 +1,185 @@
+/* 모달 스타일 */
+.hidden {
+    display: none;
+}
+
+.modal {
+    display: none; /* 기본적으로 모달을 숨깁니다. */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* 검은 배경 */
+    justify-content: center;
+    align-items: center;
+    display: flex; /* 중앙 정렬을 위해 flex 컨테이너로 설정 */
+}
+
+.modal-content {
+    width: 767px;
+    height: 809px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    padding: 22px 0 0 0;
+}
+
+.modal-header {
+    width: 100%;
+    height: auto;
+    background: transparent; /* 배경색 제거 */
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    align-items: center;
+    padding: 20px; /* 패딩 추가 */
+    position: relative;
+}
+
+.modal-title {
+    text-align: center;
+    color: #171A1F;
+    font-size: 20px;
+    font-family: Pretendard GOV Variable;
+    font-weight: 700;
+    line-height: 36px;
+    flex-grow: 1; /* 공간을 채우도록 설정 */
+    background: transparent; /* 배경색 제거 */
+}
+
+.modal-close-button {
+    position: absolute; /* 절대 위치 */
+    right: 20px; /* 오른쪽에 고정 */
+    top: 50%; /* 세로 중앙에 고정 */
+    transform: translateY(-50%); /* 세로 중앙 정렬 */
+    width: 44px;
+    height: 44px;
+    padding: 9px;
+    background: #006600;
+    border-radius: 22px;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    cursor: pointer;
+}
+
+.modal-close-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-username {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.modal-username-inner {
+    padding-left: 13px;
+    padding-right: 13px;
+    background: #F3F4F6;
+    border-radius: 14px;
+    display: inline-block;
+}
+
+.modal-username-text {
+    text-align: center;
+    color: #323842;
+    font-size: 14px;
+    font-family: Pretendard GOV Variable;
+    font-weight: 400;
+    line-height: 28px;
+}
+
+.modal-editor-container {
+    position: relative;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.modal-editor {
+    width: 100%;
+    height: 300px;
+    padding: 20px;
+    border: 1px solid #BCC1CA;
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: Pretendard GOV Variable;
+    font-weight: 400;
+    line-height: 28px;
+    color: #171A1F;
+    outline: none;
+    box-sizing: border-box; /* 패딩과 보더 포함한 크기 계산 */
+}
+
+.modal-divider {
+    width: 760px;
+    height: 0;
+    position: absolute;
+    left: 7px;
+    top: 722px;
+    border: 1px #BCC1CA solid;
+}
+
+.modal-button {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 23px;
+    padding-right: 22px;
+    position: absolute;
+    left: 676px;
+    top: 736px;
+    background: linear-gradient(90deg, #006600 0%, #66FF66 100%);
+    border-radius: 8px;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+}
+
+.modal-button-text {
+    text-align: center;
+    color: white;
+    font-size: 15px;
+    font-family: Pretendard GOV Variable;
+    font-weight: 700;
+    line-height: 28px;
+    word-wrap: break-word;
+}
+
+.modal-img-button {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 27px;
+    top: 736px;
+    background: rgba(0, 0, 0, 0);
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+}
+
+.modal-img-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.file-info {
+    padding: 10px;
+    background: #F8F9FA;
+    border: 1px solid #BCC1CA;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #323842;
+    max-height: 100px;
+    overflow-y: auto;
+}
