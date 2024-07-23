@@ -1,14 +1,16 @@
-body {
+.main-content {
   background: #E0E0E0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  height: 100vh;
 }
 
 .container-211 {
-  position: fixed;
+  position: relative;
   width: 700px;
   height: 800px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   background: #ffffff;
   border-radius: 8px;
   padding: 20px;
@@ -43,15 +45,13 @@ body {
 }
 
 
-
-
 .container-211 .form-group {
   width: 80%; /* 입력 폼의 너비를 조정 */
   margin: 0 auto; /* 입력 폼을 가운데로 정렬 */
 }
 
 .container-211 .form-group label {
-  margin-top: 50px;
+  margin-top: 30px;
   display: block;
   height: 22px;
   font-family: 'Pretendard GOV Variable';

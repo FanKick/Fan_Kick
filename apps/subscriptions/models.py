@@ -28,6 +28,8 @@ class Subscription(models.Model):
 
     def save(self, *args, **kwargs):
         self.end_date = self.start_date + timezone.timedelta(days=self.plan_id.duration)
+        # 구독 상태 업데이트
+        self.status = self.is_active_subscription()
         super().save(*args, **kwargs)
 
     def is_active_subscription(self):
