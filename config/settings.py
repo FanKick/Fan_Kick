@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apps.payments',
     'apps.search',
     'apps.subscriptions',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -172,3 +173,14 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # 보내는 사람 이메일 주소
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SITE_URL = 'http://localhost:8000'
+
+
+
+# DB 주기적 상태 업데이트 by Celery
+# Celery 설정
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis 브로커 URL
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Redis 결과 백엔드
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
