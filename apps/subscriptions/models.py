@@ -27,8 +27,15 @@ class Subscription(models.Model):
     status = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        self.end_date = self.start_date + timezone.timedelta(days=self.plan.duration)
+        if not self.id:
+            self.end_date = self.start_date + timezone.timedelta(days=self.plan.duration)
+        # 구독 상태 업데이트
+        self.status = self.is_active_subscription()
         super().save(*args, **kwargs)
+
+    def is_active_subscription(self):
+        today = timezone.now().date()
+        return self.start_date <= today <= self.end_date
     
     @classmethod
     def has_active_subscription(cls, subscriber, player):
@@ -36,9 +43,8 @@ class Subscription(models.Model):
             subscriber=subscriber, 
             subscribed_to_player=player, 
             status=True,
-            end_date__gte=timezone.now()
+            end_date__gte=timezone.now().date()
         ).exists()
-
 
     def __str__(self):
         return f'Subscription #{self.id} - {self.subscriber.username} to {self.subscribed_to_player.player_name}'

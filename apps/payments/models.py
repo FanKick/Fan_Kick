@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from apps.accounts.models import *
 from apps.subscriptions.models import SubscriptionPlan, Subscription
 from django.utils import timezone
-from .services import schedule_payment, cancel_scheduled_payment
+from .services import schedule_payment
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class AbstractPortonePayment(models.Model):
         try:
             self.meta = self.api.find(merchant_uid=self.merchant_uid)
         except (Iamport.ResponseError, Iamport.HttpError) as e:
-            logger.error(str(e), exc_info=e) #error 로깅
+            logger.error(str(e), exc_info=e)
             raise Http404("포트원에서 결제내역을 찾을 수 없습니다")
         
         self.status = self.meta['status']
@@ -67,6 +67,7 @@ class AbstractPortonePayment(models.Model):
 
 
 class SubscriptionPayment(AbstractPortonePayment):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='subscription_payments')
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE)
     customer_uid = models.CharField(max_length=100, editable=False)
@@ -81,6 +82,7 @@ class SubscriptionPayment(AbstractPortonePayment):
             name=f"{player.player_name} 구독권",
             amount=plan.price,
             player=player,
+            user = subscriber,
             plan=plan,
             customer_uid=customer_uid,
         )
@@ -89,19 +91,17 @@ class SubscriptionPayment(AbstractPortonePayment):
 
     
     def schedule_next_payment(self, retry=False):
-        # 정기결제 결제실패 경우 하루 뒤 결제
+        # 정기결제 결제실패할 시, 하루 뒤 재시도
         if retry:
             schedule_at = float((timezone.now() + timezone.timedelta(days=1)).timestamp())
         else:
-            # schedule_at = float((timezone.now() + timezone.timedelta(days=self.plan.duration)).timestamp())
-            schedule_at = float((timezone.now() + timezone.timedelta(minutes=2)).timestamp())
+            schedule_at = float((timezone.now() + timezone.timedelta(days=self.plan.duration)).timestamp())
 
         self.next_merchant_uid = uuid4().hex
         self.save()
 
         schedule_payment(
             customer_uid=self.customer_uid,
-            # merchant_uid=self.next_merchant_uid,
             merchant_uid=self.next_merchant_uid,
             amount=self.amount,
             schedule_at=schedule_at,
@@ -109,13 +109,13 @@ class SubscriptionPayment(AbstractPortonePayment):
         )
 
   
-    def create_subscription_if_paid(self, subscriber):
+    def create_subscription_if_paid(self):
         if self.is_paid:
             Subscription.objects.create(
-                subscriber=subscriber,
+                subscriber=self.user,
                 subscribed_to_player=self.player,
                 plan=self.plan,
-                start_date=timezone.now(),
+                start_date=timezone.now().date(),
             )
 
             # 결제 성공시에만 다음 결제 예약
@@ -126,6 +126,7 @@ class SubscriptionPayment(AbstractPortonePayment):
 
             meta = self.api.find(merchant_uid=self.next_merchant_uid)
 
+            # 예약결제건 결제내역 저장
             payment = SubscriptionPayment.objects.create(
                 uid=UUID(self.next_merchant_uid),
                 player=self.player,
@@ -135,9 +136,24 @@ class SubscriptionPayment(AbstractPortonePayment):
                 status = self.meta['status'],
                 name=self.name,
                 meta=meta,
+                user=self.user,
             )
 
             payment.portone_check(commit=True)
+
+            # 결제 성공시, 구독권 연장
+            if self.is_paid:
+
+                subscription = Subscription.objects.filter(
+                subscriber=self.user,
+                subscribed_to_player=self.player,
+                plan=self.plan,
+                status=True
+                ).first()
+
+                subscription.end_date += timezone.timedelta(days=self.plan.duration)
+                subscription.save()
+
 
             payment.schedule_next_payment()
 

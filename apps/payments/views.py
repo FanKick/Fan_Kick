@@ -3,21 +3,20 @@ from django.contrib import messages
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 from django.conf import settings
-# from .models import SubscriptionPayment
 from .models import *
 from apps.accounts.models import *
 from apps.subscriptions.models import *
 from django.http import Http404, HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST, require_GET
-# from .services import *
+from .services import *
 from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
 ## test 하려고 만든 함수
 def pay_home(request):
-    players = Player.objects.all()
-    return render(request, 'payments/payment_home.html', 
+    players = Player.objects.filter(team__team_name='FC 서울')
+    return render(request, 'payments/pay_home.html', 
         {
             'players' : players,
         }
@@ -28,11 +27,13 @@ def subsctiption_pay(request,pk):
     player = Player.objects.get(pk=pk)
     subscriber = request.user
 
-    #TODO: 유효구독 예외처리 엉성함 수정
-    if Subscription.has_active_subscription(subscriber, player):
-        # messages('현재 유효한 구독이 있습니다. 새로운 구독을 결제할 수 없습니다.')
-        # return redirect("payments:payment_detail", pk=pk)
-        raise Http404("현재 유효한 구독이 있습니다")
+    # #TODO: 유효구독 redicrt 디엠창으로
+    # if Subscription.has_active_subscription(subscriber, player):
+    #     # messages('현재 유효한 구독이 있습니다. 새로운 구독을 결제할 수 없습니다.')
+
+    #     #### fix: 해당 선수와의 디엠창으로 리다이렉트 ####
+    #     # return redirect("payments:payment_detail", pk=pk)
+    #     raise Http404("현재 유효한 구독이 있습니다")
     
     payment = SubscriptionPayment.create_by_payment(player, subscriber, 'Basic Plan')
 
@@ -63,8 +64,7 @@ def payment_check(request, pk):
     payment.portone_check()
 
     # 결제 성공시 구독 등록
-    payment.create_subscription_if_paid(request.user)
-    
+    payment.create_subscription_if_paid()
 
     return redirect("payments:payment_detail", pk=pk)
 
@@ -83,15 +83,20 @@ def cancel_schedule_payment(request, pk):
     payment = get_object_or_404(SubscriptionPayment, pk=pk)
     
     try:
-        recent_payment = SubscriptionPayment.objects.filter(customer_uid=payment.customer_uid).order_by('-created_at').first()
-        # 예약된 결제 취소
-        response=cancel_scheduled_payment(recent_payment.customer_uid, recent_payment.next_merchant_uid)
-        
-        # 여기서 구독 상태를 갱신
-        
-        return HttpResponse(f"예약된 결제가 취소되었습니다: {response}", status=200)
-    except Exception as e:
 
+        recent_payment = SubscriptionPayment.objects.filter(
+            customer_uid=payment.customer_uid,
+            player_id=payment.player_id
+        ).order_by('-created_at').first()
+
+
+        # 예약된 결제 취소
+        response = cancel_scheduled_payment(recent_payment.customer_uid, recent_payment.next_merchant_uid)
+        
+        ## rediect로 취소내역 보여주는걸로 수정해야함
+        return HttpResponse(f"예약된 결제가 취소되었습니다: {response}", status=200)
+    
+    except Exception as e:
         return HttpResponse(f"예약 취소 실패: {e}", status=400)
 
 
@@ -108,11 +113,14 @@ def payment_webhook(request):
 
         # 정기결제 결제완료
         if status == 'paid':
-            payment = SubscriptionPayment.objects.get(next_merchant_uid=merchant_uid)
-
-            payment.save_schedule_payment()
-
-            print("다음예약")
+            try:
+                payment = SubscriptionPayment.objects.get(uid=merchant_uid)
+                pass
+                
+            except SubscriptionPayment.DoesNotExist:
+                payment = SubscriptionPayment.objects.get(next_merchant_uid=merchant_uid)
+                payment.save_schedule_payment()
+            
 
         # 정기결제 결제실패
         elif status == 'failed':

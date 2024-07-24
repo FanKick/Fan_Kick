@@ -2,12 +2,13 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/accounts/update_user_info.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"\>
 <div class="main-content">
     <div class="user-info-container">
         <div class="user-info-sidebar">
           <ul class="user-info-menu">
             <li><a href="{% url 'accounts:update_user_info' %}" class="btn-user-info"><i class="fas fa-user"></i> 회원정보</a></li>
-            <li><a href="#" class="btn-subscription"><i class="fas fa-bell"></i> 구독관리</a></li>
+            <li><a href="{% url 'subscriptions:subscription_management' %}" class="btn-subscription"><i class="fas fa-bell"></i> 구독관리</a></li>
             <li><a href="#" class="btn-community"><i class="fas fa-users"></i> 커뮤니티 관리</a></li>
           </ul>
         </div>

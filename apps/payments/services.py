@@ -13,7 +13,6 @@ def api(self):
         imp_key=settings.PORTONE_API_KEY, imp_secret=settings.PORTONE_API_SECRET
     )
 
-
 def get_portone_token():
     iamport = Iamport(imp_key=settings.PORTONE_API_KEY, imp_secret=settings.PORTONE_API_SECRET)
     response = iamport._get_token()
@@ -37,11 +36,7 @@ def schedule_payment(customer_uid, merchant_uid, amount, schedule_at, name):
         ]
     }
 
-    # print("Scheduling payment with payload:", payload)
-
     response = iamport.pay_schedule(**payload)
-
-    # print("Payment schedule response:", response)
     
     return response
 
@@ -54,7 +49,5 @@ def cancel_scheduled_payment(customer_uid, merchant_uid):
     }
 
     response = iamport.pay_unschedule(**payload)
-
-    print("Payment unschedule response:", response)
     
     return response

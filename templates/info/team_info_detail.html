@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+FAN KICK - {{ team.team_name }}
+{% endblock title %}
+
+{% block extra-style %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/info/introduction.css' %}">
+{% endblock extra-style %}
+
+{% block content %}
+<div class="info-body">
+    <div class="info-main">
+        <div class="info-image">
+            <div class="info-team-image" style="background-image: url('{{ team_info.team_club_picture.url }}');">
+                <div class="info-team-image-overlay"></div>
+            </div>
+        </div>
+
+        <div class="info-emblem-description">
+            {% if team.team_picture %}
+                <div class="info-team-image-logo">
+                    <img src="{{ team.team_picture.url }}" alt="{{ team.team_name }} 로고">
+                </div>
+            {% endif %}
+            <div class="info-description">
+                {{ team.team_description }}
+            </div>
+        </div>
+
+        <div class="info-player">
+            <div class="info-players-info">
+                <div class="info-player-title">공격수(FW)</div>
+                <div class="info-players-container">
+                    <div class="arrow arrow-left" data-container="fw">&lt;</div> <!-- 왼쪽 화살표 -->
+                    <div class="info-players" id="players-fw">
+                        {% for player in players_fw %}
+                            <div class="info-player-card">
+                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <div class="info-player-name">{{ player.player_name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="arrow arrow-right" data-container="fw">&gt;</div> <!-- 오른쪽 화살표 -->
+                </div>
+
+                <div class="info-player-title">미드필더(MF)</div>
+                <div class="info-players-container">
+                    <div class="arrow arrow-left" data-container="mf">&lt;</div> <!-- 왼쪽 화살표 -->
+                    <div class="info-players" id="players-mf">
+                        {% for player in players_mf %}
+                            <div class="info-player-card">
+                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <div class="info-player-name">{{ player.player_name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="arrow arrow-right" data-container="mf">&gt;</div> <!-- 오른쪽 화살표 -->
+                </div>
+
+                <div class="info-player-title">수비수(DF)</div>
+                <div class="info-players-container">
+                    <div class="arrow arrow-left" data-container="df">&lt;</div> <!-- 왼쪽 화살표 -->
+                    <div class="info-players" id="players-df">
+                        {% for player in players_df %}
+                            <div class="info-player-card">
+                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <div class="info-player-name">{{ player.player_name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="arrow arrow-right" data-container="df">&gt;</div> <!-- 오른쪽 화살표 -->
+                </div>
+
+                <div class="info-player-title">골키퍼(GK)</div>
+                <div class="info-players-container">
+                    <div class="arrow arrow-left" data-container="gk">&lt;</div> <!-- 왼쪽 화살표 -->
+                    <div class="info-players" id="players-gk">
+                        {% for player in players_gk %}
+                            <div class="info-player-card">
+                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <div class="info-player-name">{{ player.player_name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="arrow arrow-right" data-container="gk">&gt;</div> <!-- 오른쪽 화살표 -->
+                </div>
+
+            </div>
+        </div>
+
+        <div class="info-community-button">
+            <div class="info-community-button-wrapper">
+                <a class="info-community-button-link" href="#">커뮤니티 바로가기 </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra-script %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const arrows = document.querySelectorAll('.arrow');
+
+    arrows.forEach(function(arrow) {
+        arrow.addEventListener('click', function() {
+            const containerId = `players-${arrow.getAttribute('data-container')}`;
+            const playerContainer = document.getElementById(containerId);
+            let scrollAmount = playerContainer.scrollLeft;
+
+            if (arrow.classList.contains('arrow-right')) {
+                scrollAmount += 200;
+                if (scrollAmount > playerContainer.scrollWidth - playerContainer.clientWidth) {
+                    scrollAmount = playerContainer.scrollWidth - playerContainer.clientWidth;
+                }
+            } else {
+                scrollAmount -= 200;
+                if (scrollAmount < 0) {
+                    scrollAmount = 0;
+                }
+            }
+
+            playerContainer.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+</script>
+{% endblock extra-script %}

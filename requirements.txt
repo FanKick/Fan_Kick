@@ -13,7 +13,7 @@ load-dotenv==0.1.0
 packaging==24.1
 pillow==10.4.0
 pluggy==1.5.0
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pytest==8.2.2
 python-dotenv==1.0.1
 requests==2.26.0
