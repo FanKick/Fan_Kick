@@ -1,0 +1,239 @@
+{% extends 'base.html'%}
+
+{% block extra-style %}
+<style>
+    /* 모달 (background) */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    /* 모달 (main-content) */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 3% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 600px;
+        height: 830px;
+        max-width: 90%;
+        position: relative;
+        text-align: center;
+    }
+    
+    .close {
+        color: #aaa;
+        position: absolute;
+        right: 30px;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #modalPlayerName{
+        padding-top: 20px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    #modalPlayerProfile {
+        padding-top:50px;
+        width: 150px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .additional-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+        font-size: 18px;
+    }
+
+    .subscription-price {
+        margin-left: 150px;
+    }
+
+    .highlight {
+        color:#888;
+    }
+
+    .notice {
+        margin-top: 40px;
+        width: 80%;
+        text-align: left;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .notice-title {
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .notice ul {
+        list-style: disc;
+    }
+
+    .notice li {
+        margin-bottom: 10px;
+        font-size: 16px;
+        color:#888;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .modal-buttons button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+    }
+
+    #cancelButton {
+        background-color: transparent;
+        color: #000;
+        border: 1px solid #ccc;
+    }
+
+    #subscribeButton {
+        background-color: #28a745;
+        color: white;
+        border: 1px solid #28a745;
+    }
+
+
+</style>
+{% endblock extra-style %}
+
+{% block content %}
+    {% for player in players %}
+    <h2 class="player-trigger" data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
+        data-player-profile="{% if player.user.profile %}{{ player.user.profile.url }}{% else %}{% endif %}"
+        data-url="{% url 'payments:subsctiption_pay' pk=player.id %}"> <!-- 플레이어별 결제 url 달아줘야됨-->
+        {{ player.player_name }}
+    </h2>
+    {% if player.user.profile %}
+        <img src="{{ player.user.profile.url }}" alt="{{ player.player_name }}'s profile picture" class="player-trigger"
+            data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
+            data-player-profile="{{ player.user.profile.url }}" data-url="{% url 'payments:subsctiption_pay' pk=player.id %}" style="width: 100px; height: auto;">
+    {% else %}
+        <p>No profile picture available.</p>
+    {% endif %}
+    {% endfor %}
+    
+    <!-- Modal -->
+    <div class="modal" id="playerModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalPlayerProfile" alt="Player profile picture">
+            <div id="modalPlayerName"></div>
+            <div class="additional-info">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7.5" stroke="#565E6D"/>
+                    <circle cx="8" cy="8" r="4.5" fill="#006600"/>
+                </svg>
+                <span>월 구독 DM</span>
+                <span class="subscription-price">4000원/<span class="highlight">월</span></span>
+            </div>
+            <div class="notice">
+                <div class="notice-title">유의사항</div>
+                <ul>
+                    <li>구독 기간 동안 플레이어의 메시지를 수신하고, 플레이어에게 메시지를 보낼 수 있습니다.</li>
+                    <li>매월 자동으로 정기 결제 되는 상품 입니다. 이용권 금액은 결제 시 결제일로부터 한 달간 서비스를 이용하는 요금이며, 한달 뒤 자동갱신(자동결제) 됩니다.</li>
+                    <li>플레이어 비방, 명예훼손, 불안감 조장, 음란성, 사행성, 사칭, 도배, 홍보, 금전/물품 거래, 범죄 조장/방조, 시스템 오류 유발, 기타 서비스 운영 정책 및 법령에 위배되는 내용을 전송한 경우, 메시지 숨김 처리 및 차단 등의 제한 조치가 이루어지며, 해당 사유로 인한 환불은 불가합니다.</li>
+                </ul>
+            </div>
+            <form id="subscribeForm" method="get">
+                <button type="button" id="cancelButton">취소</button>
+                <button type="submit" id="subscribeButton">구독하기</button>
+            </form>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra-script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById('playerModal');
+        var modalPlayerName = document.getElementById('modalPlayerName');
+        var modalPlayerProfile = document.getElementById('modalPlayerProfile');
+        var triggers = document.querySelectorAll('.player-trigger');
+        var closeModalButton = document.querySelector('.close');
+        var cancelButton = document.getElementById('cancelButton');
+        var subscribeButton = document.getElementById('subscribeButton');
+        var subscribeForm = document.getElementById('subscribeForm');
+
+        modal.style.display = "none";
+
+        triggers.forEach(function(trigger) {
+            trigger.addEventListener('click', function() {
+                var playerId = this.getAttribute('data-player-id');
+                var playerName = this.getAttribute('data-player-name');
+                var playerProfile = this.getAttribute('data-player-profile');
+                var playerUrl = this.getAttribute('data-url');
+                
+                modalPlayerName.textContent = playerName;
+                // 이미지 존재할 시 띄움
+                if (playerProfile) {
+                    modalPlayerProfile.src = playerProfile;
+                    modalPlayerProfile.style.display = 'block';
+                } else {
+                    modalPlayerProfile.style.display = 'none';
+                }
+
+
+                modal.style.display = "block";
+
+                subscribeForm.setAttribute('action', playerUrl);
+
+
+            });
+        });
+
+        closeModalButton.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+
+
+        cancelButton.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+
+        subscribeButton.addEventListener('click', function() {
+            subscribeForm.submit();
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
+
+
+    });
+</script>
+{% endblock extra-script %}
