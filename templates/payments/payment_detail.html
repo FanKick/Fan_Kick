@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>결제내역</h2>
+{{payment.get_status_display}}
+{{payment.merchant_uid}}
+{{payment.name}}
+{{payment.amount}}
+{{payment.is_paid}}
+{{payment.created_at}}
+
+<button><a href = "{% url 'payments:cancel_schedule_payment' pk=payment.id %}">예약취소</a></button>
+
+{% endblock content %}
