@@ -6,77 +6,88 @@
 
 <body>
 <header class="header">
-    <div class="left-section">
-        <div class = "logo">
-            <a href = "{% url 'index' %}"><img src="{% static 'fankick_logo.png' %}" alt="FANKICK LOGO"></a>
-        </div>
+    <div class="header-logo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'fankick_logo.png' %}" alt="FANKICK LOGO">
+        </a>
     </div>
 
-    <div class="right-section">
-        <div class = "nav-links">
-            {% if user.is_authenticated %}
-                <div class = "login_nav">
-                    <ul>
-                        <div id="search-bar" class="search-bar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M20.5714 20.5714L17.1429 17.1428" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                                <path d="M10.2857 17.1428C14.0728 17.1428 17.1428 14.0727 17.1428 10.2856C17.1428 6.49851 14.0728 3.42847 10.2857 3.42847C6.49861 3.42847 3.42856 6.49851 3.42856 10.2856C3.42856 14.0727 6.49861 17.1428 10.2857 17.1428Z" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                                <path d="M6.85715 10.2857C6.85715 9.37644 7.21837 8.50436 7.86135 7.86138C8.50433 7.2184 9.3764 6.85718 10.2857 6.85718" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10"/>
-                            </svg>
-                            <input type="text" placeholder="플레이어 검색">
+    <div class="header-nav-links">
+        {% if user.is_authenticated %}
+            <div class="header-nav-item">
+                <div id="search-container" class="header-search-container">
+                    <img id="search-icon" src="{% static 'images/search_icon.svg' %}" alt="Search Icon" onclick="toggleSearchBar()">
+                    <div id="search-bar" class="header-search-bar" style="display: none;">
+                        <div class="search-bar-icon">
+                            <img src="{% static 'images/search_icon.svg' %}" alt="Search Icon">
                         </div>
-                        <li><a href="#" onclick ="toggleSearchBar()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none">
-                                <path d="M20.5714 20.5714L17.1429 17.1428" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                                <path d="M10.2857 17.1428C14.0728 17.1428 17.1428 14.0727 17.1428 10.2856C17.1428 6.49851 14.0728 3.42847 10.2857 3.42847C6.49861 3.42847 3.42856 6.49851 3.42856 10.2856C3.42856 14.0727 6.49861 17.1428 10.2857 17.1428Z" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                                <path d="M6.85715 10.2857C6.85715 9.37644 7.21837 8.50436 7.86135 7.86138C8.50433 7.2184 9.3764 6.85718 10.2857 6.85718" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10"/>
-                            </svg>
-                        </a></li>
-                        <li><a href="#">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none">
-                                <path d="M18 11.143V8.57153C18 6.98023 17.3678 5.45411 16.2426 4.32889C15.1174 3.20367 13.5913 2.57153 12 2.57153C10.4087 2.57153 8.88256 3.20367 7.75735 4.32889C6.63213 5.45411 5.99999 6.98023 5.99999 8.57153V11.143C5.99999 13.9715 3.42856 14.6572 3.42856 16.2858C3.42856 17.743 6.77142 18.8572 12 18.8572C17.2286 18.8572 20.5714 17.743 20.5714 16.2858C20.5714 14.6572 18 13.9715 18 11.143Z" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                                <path d="M12 20.5713C11.1334 20.5713 10.3191 20.5422 9.55286 20.4856C9.71622 21.0067 10.0417 21.4621 10.4818 21.7854C10.922 22.1087 11.4539 22.283 12 22.283C12.5461 22.283 13.078 22.1087 13.5182 21.7854C13.9583 21.4621 14.2838 21.0067 14.4471 20.4856C13.6809 20.5422 12.8666 20.5713 12 20.5713Z" fill="#171A1F"/>
-                            </svg>
-                        </a></li>
-                        <li><a href = "{% url 'accounts:update_user_info' %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none">
-                                <path d="M2.57144 21.4286C2.57144 16.6946 6.40887 12.8572 11.1429 12.8572H12.8572C17.5912 12.8572 21.4286 16.6946 21.4286 21.4286" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                                <path d="M12 12.8572C14.8403 12.8572 17.1429 10.5547 17.1429 7.71439C17.1429 4.87407 14.8403 2.57153 12 2.57153C9.15968 2.57153 6.85715 4.87407 6.85715 7.71439C6.85715 10.5547 9.15968 12.8572 12 12.8572Z" stroke="#171A1F" stroke-width="2.05714" stroke-miterlimit="10" stroke-linecap="square"/>
-                            </svg>
-                        </a></li>
-                        <li class = "dm-icon"><a href="#">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none">
-                                <path d="M14.2449 21.4285C14.078 21.4284 13.9145 21.382 13.7725 21.2943C13.6305 21.2067 13.5157 21.0813 13.4409 20.9322L10.776 15.5999C10.7041 15.4557 10.6722 15.295 10.6835 15.1343C10.6948 14.9736 10.749 14.8189 10.8403 14.6862L15.1432 8.85762L9.31459 13.1588C9.18208 13.2501 9.0275 13.3043 8.86694 13.3156C8.70639 13.3269 8.54574 13.2949 8.40173 13.223L3.06773 10.5582C2.91167 10.4795 2.78193 10.3571 2.69443 10.2058C2.60693 10.0545 2.56546 9.88096 2.5751 9.70645C2.58474 9.53195 2.64508 9.36405 2.74872 9.22333C2.85236 9.0826 2.9948 8.97517 3.15859 8.91419L20.22 2.62619C20.381 2.56672 20.5556 2.55463 20.7232 2.59136C20.8908 2.62808 21.0443 2.71208 21.1657 2.83341C21.287 2.95473 21.371 3.10829 21.4077 3.27589C21.4444 3.44349 21.4323 3.61811 21.3729 3.77905L15.0857 20.8413C15.0252 21.0057 14.9179 21.1487 14.777 21.2528C14.6361 21.3568 14.4678 21.4173 14.2929 21.4268L14.2449 21.4285Z" fill="#FAFAFB"/>
-                            </svg>
-                        </a></li>
-                        <li class="logout-btn"><a href = "{% url 'accounts:logout' %}">Logout</a></li>
-                    </ul>
+                        <input type="text" class="search-bar-input" placeholder="플레이어 검색">
+                    </div>
                 </div>
-            {% else %}
-                <div class = "nologin_nav">
-                    <ul>
-                        <li><a href = "{% url 'accounts:signup_step1' %}">Sign up</a></li>
-                        <li><a href = "{% url 'accounts:login' %}">Log in</a></li>
-                    </ul>
+            </div>
+
+            <div class="header-nav-item">
+                <div class="header-icon-container">
+                    <img src="{% static 'images/notification_icon.svg' %}" alt="Notification Icon">
                 </div>
-            {% endif %}
-        </div>
+            </div>
+            <div class="header-nav-item">
+                <div class="header-icon-container">
+                    <a href="{% url 'accounts:update_user_info' %}">
+                        <img src="{% static 'images/profile_icon.svg' %}" alt="Profile Icon">
+                    </a>
+                </div>
+            </div>
+
+            <div class="header-nav-item header-profile-icon">
+                <img src="{% static 'images/dm_icon.svg' %}" alt="DM Icon">
+            </div>
+            
+            <div class="header-nav-item header-button-container">
+                <a href="{% url 'accounts:logout' %}">
+                    <div>Log out</div>
+                </a>
+            </div>
+        {% else %}
+            <div class="header-nav-item header-button-container">
+                <a href="{% url 'accounts:signup_step1' %}">
+                    <div>Sign in</div>
+                </a>
+            </div>
+            <div class="header-nav-item header-button-container">
+                <a href="{% url 'accounts:login' %}">
+                    <div>Log in</div>
+                </a>
+            </div>
+        {% endif %}
     </div>
-
-
-
-
 </header>
 
 <script>
     function toggleSearchBar() {
+        var searchIcon = document.getElementById('search-icon');
         var searchBar = document.getElementById('search-bar');
-        if (searchBar.style.display === 'flex') {
-            searchBar.style.display = 'none';
-        } else {
+
+        if (searchBar.style.display === 'none') {
+            searchIcon.style.display = 'none';
             searchBar.style.display = 'flex';
+            searchBar.querySelector('.search-bar-input').focus(); // 검색 바에 포커스 설정
+        } else {
+            searchBar.style.display = 'none';
+            searchIcon.style.display = 'block';
         }
     }
+
+    // Add event listener to close the search bar when clicking outside of it
+    document.addEventListener('click', function(event) {
+        var searchContainer = document.getElementById('search-container');
+        var searchBar = document.getElementById('search-bar');
+        var searchIcon = document.getElementById('search-icon');
+        if (!searchContainer.contains(event.target)) {
+            searchBar.style.display = 'none';
+            searchIcon.style.display = 'block';
+        }
+    });
 </script>
 
 {% block extra-script %}{% endblock extra-script %}
