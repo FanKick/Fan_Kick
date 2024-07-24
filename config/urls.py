@@ -30,10 +30,7 @@ urlpatterns = [
     path('accounts/', include('apps.accounts.urls')),
     path('info/', include('apps.info.urls')), # jihyun
     path('subscriptions/', include('apps.subscriptions.urls')),
-<<<<<<< HEAD
     path('payments/', include('apps.payments.urls')),
-=======
->>>>>>> main
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
