@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/accounts/my_community.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="main-content">
+    <div class="user-info-container">
+        <div class="user-info-sidebar">
+            <ul class="user-info-menu">
+                <li><a href="{% url 'accounts:update_user_info' %}" class="btn-user-info"><i class="fas fa-user"></i> 회원정보</a></li>
+                <li><a href="{% url 'subscriptions:subscription_management' %}" class="btn-subscription"><i class="fas fa-bell"></i> 구독관리</a></li>
+                <li><a href="{% url 'accounts:my_community' %}" class="btn-community active"><i class="fas fa-users"></i> 커뮤니티 관리</a></li>
+            </ul>
+        </div>
+
+        <div class="user-info-content">
+            <h2>나의 커뮤니티</h2>
+            <div class="community-info-sidebar">
+                <a href="{% url 'accounts:my_community' %}" id="community-list-btn" class="btn active">가입 커뮤니티 목록</a>
+                <a href="{% url 'accounts:my_posts' %}" id="my-posts-btn" class="btn">내가 쓴 게시글</a>
+                <a href="{% url 'accounts:my_comments' %}" id="my-comments-btn" class="btn">내가 쓴 댓글</a>
+            </div>
+
+            <table id="content-table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>구단명</th>
+                        <th>Joined on</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody id="subscription-list">
+                    {% for membership in page_obj %}
+                    <tr>
+                        <td>{{ membership.number }}</td>
+                        <td>{{ membership.team.team_name }}</td>
+                        <td>{{ membership.date_joined|date:"Y.m.d" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'accounts:leave_community' membership.id %}" class="leave-form">
+                                {% csrf_token %}
+                                <button type="button" class="btn-leave" onclick="openModal({{ membership.id }})">탈퇴</button>
+                            </form>
+
+                            <div id="leave-modal-{{ membership.id }}" class="modal">
+                                <div class="modal-content">
+                                    <span class="close" onclick="closeModal({{ membership.id }})">&times;</span>
+                                    <p>정말로 탈퇴하시겠습니까?</p>
+                                    <form method="post" action="{% url 'accounts:leave_community' membership.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-leave-confirm">확인</button>
+                                        <button type="button" class="btn-leave-cancel" onclick="closeModal({{ membership.id }})">취소</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not page_obj %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; height: 50px;">가입한 커뮤니티가 없습니다.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            {% if page_obj.has_next %}
+            <div class="load-more-container">
+                <button id="load-more" data-next-page="{{ page_obj.next_page_number }}" data-limit="5">more</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(membershipId) {
+    document.getElementById('leave-modal-' + membershipId).style.display = 'block';
+}
+
+function closeModal(membershipId) {
+    document.getElementById('leave-modal-' + membershipId).style.display = 'none';
+}
+
+function attachLoadMoreListener() {
+    var loadMoreButton = document.getElementById('load-more');
+    if (loadMoreButton) {
+        loadMoreButton.addEventListener('click', function() {
+            var button = this;
+            var nextPage = button.getAttribute('data-next-page');
+            var limit = button.getAttribute('data-limit');
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '{% url "accounts:my_community" %}?page=' + nextPage + '&limit=' + limit, true);    // AJAX 요청 보내기
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(xhr.responseText, 'text/html');
+                    var newMemberships = doc.querySelectorAll('#subscription-list tr');
+                    var membershipsList = document.getElementById('subscription-list');
+                    newMemberships.forEach(function(tr) {
+                        membershipsList.appendChild(tr); // 새로운 커뮤니티 내역
+                    });
+                    var newButton = doc.getElementById('load-more');
+                    if (newButton) {
+                        button.setAttribute('data-next-page', newButton.getAttribute('data-next-page'));
+                    } else {
+                        button.remove();
+                    }
+                } else {
+                    button.remove();
+                }
+            };
+            xhr.send();
+        });
+    }
+}
+
+attachLoadMoreListener();
+
+</script>
+
+{% endblock %}

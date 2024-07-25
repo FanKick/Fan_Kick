@@ -19,7 +19,7 @@ def post_detail_json(request, post_id):
         'username': post.user.username,
         'content': post.content,
         'images': [image.image_url.url for image in post.images.all()],
-        'comments': [{'username': comment.user.username, 'content': comment.content} for comment in comments],
+        'comments': [{'id': comment.id, 'username': comment.user.username, 'content': comment.content} for comment in comments],
         'is_member': is_member,
         'user_has_liked': user_has_liked,
         'likes_count': likes_count,

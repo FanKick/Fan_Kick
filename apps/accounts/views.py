@@ -204,3 +204,90 @@ def delete_account(request):
         logout(request)
         messages.success(request, '회원 탈퇴가 성공적으로 처리되었습니다.')
         return redirect('home')  # 탈퇴 후 리디렉션할 URL
+    
+
+
+# 커뮤니티 관리
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from .models import Membership
+from apps.contents.models import Post, Comment
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
+
+# 가입 커뮤니티 목록
+@login_required
+def my_community_view(request):
+    memberships_list = Membership.objects.filter(user=request.user).order_by('-date_joined')
+    
+    # 페이지네이션 설정 (페이지당 5개 항목)
+    paginator = Paginator(memberships_list, 5)
+    page_number = request.GET.get('page')
+    memberships = paginator.get_page(page_number)
+    
+    # 각 커뮤니티 항목의 번호를 계산하여 추가 (역순으로 번호 매기기)
+    for index, membership in enumerate(memberships, start=1):
+        membership.number = (len(memberships_list) - (memberships.start_index() + index - 1)) + 1
+  
+    
+    return render(request, 'accounts/my_community.html', {'page_obj': memberships})
+
+# 커뮤니티 탈퇴
+@login_required
+def leave_community(request, membership_id):
+    if request.method == 'POST':
+        membership = Membership.objects.filter(id=membership_id, user=request.user).first()
+        if membership:
+            membership.delete()
+            messages.success(request, '커뮤니티에서 탈퇴했습니다.')
+        else:
+            messages.error(request, '탈퇴할 수 없습니다.')
+    return redirect('accounts:my_community')
+
+
+# 작성한 게시글 내역
+@login_required
+def my_posts_view(request):         # 작성한 게시글 목록
+    posts_list = Post.objects.filter(user=request.user).order_by('-created_at')
+
+    paginator = Paginator(posts_list, 5)  # 5개씩 보여줌
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+
+    # 각 게시글 항목의 번호를 계산하여 추가 (역순으로 번호 매기기)
+    for index, post in enumerate(posts, start=1):
+        post.number = (len(posts_list) - (posts.start_index() + index - 1)) + 1
+    
+    return render(request, 'accounts/my_posts.html', {'page_obj': posts})
+
+
+# 게시글 삭제 in 마이페이지
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        post.delete()
+    return redirect('accounts:my_posts')  # 게시글 목록 페이지로 리디렉션
+
+@login_required
+def my_comments_view(request):      # 작성한 댓글 목록
+    comments_list = Comment.objects.filter(user=request.user).order_by('-created_at')
+    paginator = Paginator(comments_list, 5)  # 5개씩 보여줌
+    page_number = request.GET.get('page')
+    comments = paginator.get_page(page_number)
+
+    # 각 게시글 항목의 번호를 계산하여 추가 (역순으로 번호 매기기)
+    for index, post in enumerate(comments, start=1):
+        post.number = (len(comments_list) - (comments.start_index() + index - 1)) + 1
+    
+    return render(request, 'accounts/my_comments.html', {'page_obj': comments})
+
+# 작성 댓글 삭제
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.method == 'POST':
+        comment.delete()
+    return redirect('accounts:my_comments') 

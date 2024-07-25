@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name='contents'
+
 urlpatterns = [
     path('team/<int:team_id>/player_post_list/', views.PlayerPostListView.as_view(), name='player_post_list'),
     path('team/<int:team_id>/user_post_list/', views.UserPostListView.as_view(), name='user_post_list'),
