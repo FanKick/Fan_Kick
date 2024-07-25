@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'django_extensions',
     'apps.accounts',
     'apps.alert',
     'apps.chattings',
@@ -168,6 +169,11 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # 이메일 비밀번호
 
 # 이메일 인증 관련 설정
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # 보내는 사람 이메일 주소
+
+#포트원
+PORTONE_SHOP_ID = os.getenv("PORTONE_SHOP_ID")
+PORTONE_API_KEY = os.getenv("PORTONE_API_KEY")
+PORTONE_API_SECRET = os.getenv("PORTONE_API_SECRET")
 
 # 세션 엔진 설정
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'

@@ -30,6 +30,7 @@ urlpatterns = [
     path('accounts/', include('apps.accounts.urls')),
     path('info/', include('apps.info.urls')), # jihyun
     path('subscriptions/', include('apps.subscriptions.urls')),
+    path('payments/', include('apps.payments.urls')),
     path('search/', include('apps.search.urls', namespace='search')),
 ]
 if settings.DEBUG:

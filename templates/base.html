@@ -10,7 +10,10 @@
     <title>{% block title %}Fan Kick{% endblock title %}</title>
     
     {% block extra-style %}{% endblock extra-style %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
+
 
 <body>
     <header>
@@ -22,6 +25,8 @@
     <footer>
         {% include 'footer.html' %}
     </footer>
+
+    {% block extra-script %} {% endblock extra-script %}
 
 </body>
 </html>
