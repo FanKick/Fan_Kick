@@ -41,7 +41,16 @@ class UserPostListView(ListView):
         team_id = self.kwargs['team_id']
         context['team_id'] = self.kwargs['team_id']
         context['team'] = get_object_or_404(Team, id=team_id)
+
+         # 현재 사용자에 대한 좋아요 상태 추가
+        if self.request.user.is_authenticated:
+            user_likes = Like.objects.filter(user=self.request.user, post__team_id=team_id).values_list('post_id', flat=True)
+            context['user_likes'] = user_likes
+        else:
+            context['user_likes'] = []
+        
         return context
+        
 
 class PlayerPostListView(ListView):
     model = Post
@@ -54,7 +63,17 @@ class PlayerPostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        team_id = self.kwargs['team_id']
         context['team_id'] = self.kwargs['team_id']
+
+        # 현재 사용자에 대한 좋아요 상태 추가
+        if self.request.user.is_authenticated:
+            user_likes = Like.objects.filter(user=self.request.user, post__team_id=team_id).values_list('post_id', flat=True)
+            context['user_likes'] = user_likes
+        else:
+            context['user_likes'] = []
+        
+        
         return context
 
 # 로그인 + 멤버쉽 가입 확인
@@ -176,11 +195,10 @@ def create_post_user(request):
 
 @login_required
 @csrf_exempt
-def join_team(request):
+def join_team(request, team_id):
     if request.method == 'POST':
-        team_id = request.POST.get('team_id')
         team = get_object_or_404(Team, id=team_id)
-        
+
         # 이미 팀의 멤버인지 확인
         if Membership.objects.filter(user=request.user, team=team).exists():
             return JsonResponse({'success': False, 'error': 'You are already a member of this team.'})
@@ -196,7 +214,15 @@ def join_team(request):
 @csrf_exempt
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if not Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists():
+    
+    # 사용자가 플레이어인 경우 팀 확인
+    if request.user.role == 'player':
+        is_member = Player.objects.filter(user=request.user, team=post.team).exists()
+    else:
+        # 사용자가 일반 사용자(user)인 경우 멤버십 확인
+        is_member = Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists()
+
+    if not is_member:
         return JsonResponse({'success': False, 'error': 'You are not a member of this team.'}, status=403)
     
     if request.method == 'POST':
@@ -215,14 +241,28 @@ def add_comment(request, post_id):
 
 
 @login_required
+@csrf_exempt
 def add_like(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if not Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists():
-        return HttpResponseForbidden("You are not a member of this team.")
+    
+    # 사용자가 플레이어인 경우 팀 확인
+    if request.user.role == 'player':
+        is_member = Player.objects.filter(user=request.user, team=post.team).exists()
+    else:
+        # 사용자가 일반 사용자(user)인 경우 멤버십 확인
+        is_member = Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists()
+
+    if not is_member:
+        return JsonResponse({'success': False, 'error': 'You are not a member of this team.'}, status=403)
     
     like, created = Like.objects.get_or_create(user=request.user, post=post)
     
     if not created:
         like.delete()
+        user_has_liked = False
+    else:
+        user_has_liked = True
     
-    return redirect('post_detail', pk=post.id)
+    likes_count = post.likes.count()
+    
+    return JsonResponse({'success': True, 'likes_count': likes_count, 'user_has_liked': user_has_liked})

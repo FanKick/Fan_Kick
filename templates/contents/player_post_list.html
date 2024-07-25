@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{% static 'contents/player_feed.css' %}">
 <link rel="stylesheet" href="{% static 'contents/create_post.css' %}">
 <link rel="stylesheet" href="{% static 'contents/modal.css' %}">
+<link rel="stylesheet" href="{% static 'contents/post_modal.css' %}">
 
 <div class="container-navbar">
     <div class="nav-item">
@@ -41,12 +42,12 @@
     {% endif %}
 </div>
 
-<!-- 모달 -->
+<!-- Create Post 모달 -->
 <div class="modal hidden" id="post-create-modal">
     <div class="modal-content">
         <div class="modal-header">
             <div class="modal-title">포스트 쓰기</div>
-            <div class="modal-close-button" id="modal-close">
+            <div class="modal-close-button" id="modal-close-create">
                 <img src="{% static 'contents/E remove.png' %}" alt="Close Icon" class="modal-close-icon">
             </div>
         </div>
@@ -56,7 +57,7 @@
             </div>
         </div>
         <div class="modal-editor-container" id="modal-editor-container">
-            <textarea class="modal-editor" id="modal-editor" placeholder="팬픽에 남겨보세요..."></textarea>
+            <textarea class="modal-editor" id="modal-editor" placeholder="자신의 게시물을 남겨보세요..."></textarea>
         </div>
         <!-- 파일 정보 표시 영역 -->
         <div class="file-info" id="file-info"></div>
@@ -84,8 +85,7 @@
                 <div class="profile-button">
                     <div class="profile-icon">
                         {% if post.user.profile %}
-                            <!-- Assume all profiles are stored in media/profiles -->
-                            <img src="/media/profiles/{{ post.user.profile.name }}" alt="Profile Image" class="container-297 profile-icon-inner">
+                            <img src="/media/{{ post.user.profile.name }}" alt="Profile Image" class="container-297 profile-icon-inner">
                         {% else %}
                             <img src="{% static 'contents/Frame.png' %}" alt="Profile Image" class="container-297 profile-icon-inner">
                         {% endif %}
@@ -98,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div class="container-297-post-details">
+            <div class="container-297-post-details" data-post-id="{{ post.id }}">
                 <p>{{ post.content }}</p>
                 {% if post.images.exists %}
                 <ul class="post-images-grid" data-image-count="{{ post.images.count }}">
@@ -110,79 +110,92 @@
                 <div class="post-footer">
                     <div class="like-comment-container">
                         <div class="icon-container">
-                            <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="icon-like">
+                            <img src="{% if post.id in user_likes %}{% static 'contents/like_liked.png' %}{% else %}{% static 'contents/like.png' %}{% endif %}" alt="Like Icon" class="icon-like" data-post-id="{{ post.id }}" data-liked="{% if post.id in user_likes %}true{% else %}false{% endif %}">
                         </div>
                         <div class="count">{{ post.likes.count }}</div>
                         <div class="icon-container">
                             <img src="{% static 'contents/comment.png' %}" alt="Comment Icon" class="icon-comment">
                         </div>
-                        <div class="count">{{ post.comments.count }}</div>
+                        <div class="count comment-count">{{ post.comments.count }}</div>
                     </div>
                 </div>
-                <div class="divider"></div> <!-- 각 포스트 사이의 구분선 -->
+                <div class="divider"></div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<!-- URL 확인용 -->
-<script>
-    console.log("{% url 'create_post_user' %}");
-</script>
+<!-- Post Detail 모달 -->
+<div id="postModal" class="post_modal modal">
+    <div class="modal-content">
+        <span class="close" id="modal-close-detail">&times;"></span>
+        <div class="modal-left">
+            <div id="postModalContent"></div>
+        </div>
+        <div class="modal-right">
+            <div id="commentsContainer">
+                <ul id="commentsList"></ul>
+            </div>
+            <form id="commentForm">
+                <textarea id="commentText" placeholder="댓글을 입력하세요..."></textarea>
+                <button type="button" id="submitComment">댓글 등록</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var inputField = document.getElementById('post-create-input');
     var modal = document.getElementById('post-create-modal');
-    var closeBtn = document.getElementById('modal-close');
+    var closeBtn = document.getElementById('modal-close-create');
     var imgBtn = document.getElementById('modal-img-button');
     var imageInput = document.getElementById('image-input');
     var fileInfo = document.getElementById('file-info');
     var submitBtn = document.getElementById('modal-submit-button');
-    var joinButton = document.getElementById('join-community');
 
-    // 페이지 로드 시 모달을 숨깁니다.
+    var detailModal = document.getElementById('postModal');
+    var detailCloseBtn = document.getElementById('modal-close-detail');
+    var postModalContent = document.getElementById('postModalContent');
+    var commentsContainer = document.getElementById('commentsContainer');
+    var submitComment = document.getElementById('submitComment');
+
     modal.classList.add('hidden');
-    modal.style.display = "none";  // 모달을 숨김
+    modal.style.display = "none";
 
-    // "자신의 포스트를 남겨보세요." 클릭 시 모달을 표시합니다.
     if (inputField) {
         inputField.addEventListener('click', function() {
             modal.classList.remove('hidden');
-            modal.style.display = "flex";  // 모달을 표시
+            modal.style.display = "flex";
         });
     }
 
-    // 모달 닫기 버튼 클릭 시 모달을 숨깁니다.
     if (closeBtn) {
         closeBtn.addEventListener('click', function() {
             modal.classList.add('hidden');
-            modal.style.display = "none";  // 모달을 숨김
+            modal.style.display = "none";
         });
     }
 
-    // 모달 이미지 버튼 클릭 시 파일 선택 창을 엽니다.
     if (imgBtn) {
         imgBtn.addEventListener('click', function() {
-            imageInput.click();  // 파일 선택 창을 엽니다.
+            imageInput.click();
         });
     }
 
-    // 파일 선택 창에서 파일 선택 시 최대 3개의 파일만 선택할 수 있도록 합니다.
     imageInput.addEventListener('change', function() {
         var files = imageInput.files;
         if (files.length > 3) {
             alert("최대 3개의 이미지만 선택할 수 있습니다.");
-            imageInput.value = "";  // 파일 선택 초기화
+            imageInput.value = "";
         } else {
             displayFileInfo(files);
         }
     });
 
-    // 파일 정보를 표시하는 함수
     function displayFileInfo(files) {
-        fileInfo.innerHTML = '';  // 기존 파일 정보 초기화
+        fileInfo.innerHTML = '';
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
             var fileElement = document.createElement('div');
@@ -191,11 +204,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 폼 제출 시 AJAX 요청을 보냅니다.
     submitBtn.addEventListener('click', function() {
         var formData = new FormData();
         formData.append('content', document.getElementById('modal-editor').value);
-        
+
         var files = imageInput.files;
         for (var i = 0; i < files.length; i++) {
             formData.append('images', files[i]);
@@ -214,26 +226,25 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 modal.classList.add('hidden');
-                modal.style.display = "none";  // 모달을 숨김
-                location.reload();  // 페이지를 새로고침하여 새로운 포스트를 표시
+                modal.style.display = "none";
+                location.reload();
             } else {
-                alert('포스트 작성에 실패했습니다.');
+                alert('포스트 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
         });
     });
 
-    // 모달 외부 클릭 시 모달을 숨깁니다.
     window.addEventListener('click', function(event) {
         if (event.target === modal) {
             modal.classList.add('hidden');
-            modal.style.display = "none";  // 모달을 숨김
+            modal.style.display = "none";
         }
     });
 
-    // 이미지 개수에 따라 그리드 클래스 추가
     var imageGrids = document.querySelectorAll('.post-images-grid');
     imageGrids.forEach(function(grid) {
         var imageCount = grid.getAttribute('data-image-count');
@@ -243,9 +254,149 @@ document.addEventListener('DOMContentLoaded', function() {
             grid.classList.add('grid-2');
         } else if (imageCount == 3) {
             grid.classList.add('grid-3');
+        } else if (imageCount > 3) {
+            grid.classList.add('grid-4');
+        }
+    });
+
+    document.querySelectorAll('.container-297-post-details').forEach(postDetail => {
+        postDetail.addEventListener('click', function() {
+            var postId = postDetail.getAttribute('data-post-id');
+            fetch(`/contents/post_detail/${postId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    postModalContent.innerHTML = `
+                        <div class="post-modal-content">
+                            <h3>${data.username}</h3>
+                            <p>${data.content}</p>
+                            <ul class="post-images-grid" data-image-count="${data.images.length}">
+                                ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image"></li>`).join('')}
+                            </ul>
+                            <p>
+                                Likes: <span id="likes-count">${data.likes_count}</span>
+                                <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
+                            </p>
+                        </div>
+                    `;
+
+                    var likeIcon = document.getElementById('like-icon');
+                    if (data.user_has_liked) {
+                        likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                    } else {
+                        likeIcon.src = "{% static 'contents/like.png' %}";
+                    }
+
+                    var mainLikeIcon = document.querySelector(`.icon-like[data-post-id="${postId}"]`);
+                    var mainLikesCount = mainLikeIcon.closest('.like-comment-container').querySelector('.count');
+                    
+                    // 포스트 디테일 모달에서 좋아요 아이콘 클릭 시 처리
+                    likeIcon.addEventListener('click', function() {
+                        fetch(`/contents/post_detail/${postId}/add_like/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById('likes-count').textContent = data.likes_count;
+                                mainLikesCount.textContent = data.likes_count;
+                                if (data.user_has_liked) {
+                                    likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                                    mainLikeIcon.src = "{% static 'contents/like_liked.png' %}";
+                                    mainLikeIcon.setAttribute('data-liked', 'true');
+                                    likeIcon.setAttribute('data-liked', 'true');
+                                } else {
+                                    likeIcon.src = "{% static 'contents/like.png' %}";
+                                    mainLikeIcon.src = "{% static 'contents/like.png' %}";
+                                    mainLikeIcon.setAttribute('data-liked', 'false');
+                                    likeIcon.setAttribute('data-liked', 'false');
+                                }
+                            } else {
+                                alert('좋아요를 변경하는 데 실패했습니다.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred: ' + error.message);
+                        });
+                    });
+
+                    var commentsHTML = data.comments.map(comment => `
+                        <li>
+                            <strong>${comment.username}</strong>: ${comment.content}
+                        </li>
+                    `).join('');
+                    commentsContainer.querySelector('ul').innerHTML = commentsHTML;
+
+                    // post_id를 댓글 폼에 설정
+                    submitComment.setAttribute('data-post-id', postId);
+
+                    var postImagesGrid = postModalContent.querySelector('.post-images-grid');
+                    var postImageCount = postImagesGrid.getAttribute('data-image-count');
+                    if (postImageCount == 1) {
+                        postImagesGrid.classList.add('grid-1');
+                    } else if (postImageCount == 2) {
+                        postImagesGrid.classList.add('grid-2');
+                    } else if (postImageCount == 3) {
+                        postImagesGrid.classList.add('grid-3');
+                    } else if (postImageCount > 3) {
+                        postImagesGrid.classList.add('grid-4');
+                    }
+
+                    detailModal.style.display = 'block';
+                });
+        });
+    });
+
+    detailCloseBtn.addEventListener('click', function() {
+        detailModal.style.display = 'none';
+    });
+
+    submitComment.addEventListener('click', function() {
+        var postId = submitComment.getAttribute('data-post-id'); // 이 부분에서 post_id를 가져옴
+        var commentText = document.getElementById('commentText').value.trim();
+        
+        if (!commentText) {
+            alert('댓글 내용을 입력하세요.');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('content', commentText);
+
+        fetch(`/contents/post_detail/${postId}/add_comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var newComment = document.createElement('li');
+                newComment.innerHTML = `<strong>${data.username}</strong>: ${data.content}`;
+                commentsContainer.querySelector('ul').appendChild(newComment);
+                document.getElementById('commentText').value = '';
+            } else {
+                alert('댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target === detailModal) {
+            detailModal.style.display = 'none';
         }
     });
 });
+
 </script>
 
 {% endblock %}

@@ -5,18 +5,19 @@
     background: white;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start !important; /* 추가: 위쪽 정렬을 위해 align-items 속성 추가 */
 }
 
 .container-297 .container-297-inner {
     width: 80%;
     max-width: 1440px;
     height: auto;
-    position: relative;
+    position: relative !important;
     background: white;
-    display: flex;
+    display: flex !important;
     flex-direction: column; /* Posts will be displayed in a column */
-    justify-content: flex-start; /* Start from the top */
+    justify-content: flex-start !important; /* Start from the top */
+    
 }
 
 .container-297 .container-297-post {
@@ -33,12 +34,13 @@
 .container-297 .container-297-team {
     width: 20%;
     position: sticky;
-    top: 0;
     display: flex;
+    top : 0;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     height: 100vh; /* 전체 높이를 화면 높이에 맞추기 */
+    justify-content: flex-end; /* 추가: 하단 정렬을 위해 flex-end로 설정 */
 }
 
 .container-297 .container-297-profile {
@@ -72,15 +74,10 @@
     width: 22px;
     height: 22px;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
 }
 
-.container-297 .profile-icon-line1,
-.container-297 .profile-icon-line2 {
-    border: 1.32px white solid;
-}
 
 .container-297 .container-297-post-details {
     display: flex;
@@ -174,13 +171,6 @@
     margin-right: 10px;
 }
 
-.container-297 .icon-like,
-.container-297 .icon-comment {
-    width: 15.71px;
-    height: 15px;
-    border: 1.71px #171A1F solid;
-}
-
 .container-297 .divider {
     width: 100%;
     border: 1px #EAECF0 solid;
@@ -195,7 +185,7 @@
     border-radius: 8px;
 }
 
-/* FC 서울 배지 스타일 */
+/* 팀 배지 스타일 */
 .container-297 .fc-seoul-badge {
     padding: 12px 39px;
     background: linear-gradient(90deg, #006600 0%, #66FF66 100%);
