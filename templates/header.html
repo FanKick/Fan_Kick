@@ -1,0 +1,94 @@
+{% load static %}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/header.css' %}">
+</head>
+
+<body>
+<header class="header">
+    <div class="header-logo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'fankick_logo.png' %}" alt="FANKICK LOGO">
+        </a>
+    </div>
+
+    <div class="header-nav-links">
+        {% if user.is_authenticated %}
+            <div class="header-nav-item">
+                <div id="search-container" class="header-search-container">
+                    <img id="search-icon" src="{% static 'images/search_icon.svg' %}" alt="Search Icon" onclick="toggleSearchBar()">
+                    <div id="search-bar" class="header-search-bar" style="display: none;">
+                        <div class="search-bar-icon">
+                            <img src="{% static 'images/search_icon.svg' %}" alt="Search Icon">
+                        </div>
+                        <input type="text" class="search-bar-input" placeholder="플레이어 검색">
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-nav-item">
+                <div class="header-icon-container">
+                    <img src="{% static 'images/notification_icon.svg' %}" alt="Notification Icon">
+                </div>
+            </div>
+            <div class="header-nav-item">
+                <div class="header-icon-container">
+                    <a href="{% url 'accounts:update_user_info' %}">
+                        <img src="{% static 'images/profile_icon.svg' %}" alt="Profile Icon">
+                    </a>
+                </div>
+            </div>
+
+            <div class="header-nav-item header-profile-icon">
+                <img src="{% static 'images/dm_icon.svg' %}" alt="DM Icon">
+            </div>
+            
+            <div class="header-nav-item header-button-container">
+                <a href="{% url 'accounts:logout' %}">
+                    <div>Log out</div>
+                </a>
+            </div>
+        {% else %}
+            <div class="header-nav-item header-button-container">
+                <a href="{% url 'accounts:signup_step1' %}">
+                    <div>Sign in</div>
+                </a>
+            </div>
+            <div class="header-nav-item header-button-container">
+                <a href="{% url 'accounts:login' %}">
+                    <div>Log in</div>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</header>
+
+<script>
+    function toggleSearchBar() {
+        var searchIcon = document.getElementById('search-icon');
+        var searchBar = document.getElementById('search-bar');
+
+        if (searchBar.style.display === 'none') {
+            searchIcon.style.display = 'none';
+            searchBar.style.display = 'flex';
+            searchBar.querySelector('.search-bar-input').focus(); // 검색 바에 포커스 설정
+        } else {
+            searchBar.style.display = 'none';
+            searchIcon.style.display = 'block';
+        }
+    }
+
+    // Add event listener to close the search bar when clicking outside of it
+    document.addEventListener('click', function(event) {
+        var searchContainer = document.getElementById('search-container');
+        var searchBar = document.getElementById('search-bar');
+        var searchIcon = document.getElementById('search-icon');
+        if (!searchContainer.contains(event.target)) {
+            searchBar.style.display = 'none';
+            searchIcon.style.display = 'block';
+        }
+    });
+</script>
+
+{% block extra-script %}{% endblock extra-script %}
+</body>

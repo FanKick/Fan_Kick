@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'django_extensions',
     'apps.accounts',
     'apps.alert',
     'apps.chattings',
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'apps.payments',
     'apps.search',
     'apps.subscriptions',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -146,7 +148,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static']
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -168,7 +170,23 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # 이메일 비밀번호
 # 이메일 인증 관련 설정
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # 보내는 사람 이메일 주소
 
+#포트원
+PORTONE_SHOP_ID = os.getenv("PORTONE_SHOP_ID")
+PORTONE_API_KEY = os.getenv("PORTONE_API_KEY")
+PORTONE_API_SECRET = os.getenv("PORTONE_API_SECRET")
+
 # 세션 엔진 설정
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SITE_URL = 'http://localhost:8000'
+
+
+
+# DB 주기적 상태 업데이트 by Celery
+# Celery 설정
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis 브로커 URL
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Redis 결과 백엔드
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
