@@ -38,7 +38,7 @@
 .container-297 .profile-button {
     width: 44px;
     height: 44px;
-    padding: 11px;
+    padding: 0;
     background: #9095A0;
     border-radius: 22px;
     overflow: hidden;
@@ -150,16 +150,6 @@
     margin-right: 10px;
 }
 
-.container-297 .icon-like,
-.container-297 .icon-comment {
-    width: 15.71px;
-    height: 15px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    border: none; /* 기존의 테두리를 제거합니다. */
-    display: inline-block; /* 이미지를 인라인 블록으로 설정 */
-}
 
 .container-297 .divider {
     width: 100%;  /* 643px 대신 100% */

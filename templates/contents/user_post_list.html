@@ -11,15 +11,15 @@
 
 <div class="container-navbar">
     <div class="nav-item">
-        <a href="{% url 'user_post_list' team.id %}" class="{% if request.path == '/contents/team/'|add:team.id|add:'/user_post_list/' %}active{% endif %}">Feed</a>
+        <a href="{% url 'user_post_list' team_id %}" class="{% if request.path == '/contents/team/'|add:team_id|add:'/user_post_list/' %}active{% endif %}">Feed</a>
     </div>
     <div class="nav-item">
-        <a href="{% url 'player_post_list' team.id %}" class="{% if request.path == '/contents/team/'|add:team.id|add:'/player_post_list/' %}active{% endif %}">Player</a>
+        <a href="{% url 'player_post_list' team_id %}" class="{% if request.path == '/contents/team/'|add:team_id|add:'/player_post_list/' %}active{% endif %}">Player</a>
     </div>
 </div>
 
 <!-- Hidden input for team ID -->
-<input type="hidden" id="team-id" value="{{ team.id }}">
+<input type="hidden" id="team-id" value="{{ team_id }}">
 
 <!-- 피드 작성란 -->
 <div class="container-298 post-create-container">
@@ -27,7 +27,7 @@
     <div class="container-298 post-create-input" id="post-create-input">
         <div class="container-298 profile-button">
             <div class="container-298 profile-icon">
-                <img src="{% if request.user.profile %}{{ request.user.profile.url }}{% else %}{% static 'contents/Frame.png' %}{% endif %}" alt="Profile Image" class="container-298 profile-icon-inner">
+                <img src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}{% static 'contents/Frame.png' %}{% endif %}" alt="Profile Image" class="container-298 profile-icon-inner">
             </div>
         </div>
         <div class="container-298 post-create-text">
@@ -85,7 +85,6 @@
                 <div class="profile-button">
                     <div class="profile-icon">
                         {% if post.user.profile %}
-                            <!-- Assume all profiles are stored in media/profiles -->
                             <img src="/media/profiles/{{ post.user.profile.name }}" alt="Profile Image" class="container-297 profile-icon-inner">
                         {% else %}
                             <img src="{% static 'contents/Frame.png' %}" alt="Profile Image" class="container-297 profile-icon-inner">
@@ -111,16 +110,16 @@
                 <div class="post-footer">
                     <div class="like-comment-container">
                         <div class="icon-container">
-                            <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="icon-like">
+                            <img src="{% if post.id in user_likes %}{% static 'contents/like_liked.png' %}{% else %}{% static 'contents/like.png' %}{% endif %}" alt="Like Icon" class="icon-like" data-post-id="{{ post.id }}" data-liked="{% if post.id in user_likes %}true{% else %}false{% endif %}">
                         </div>
                         <div class="count">{{ post.likes.count }}</div>
                         <div class="icon-container">
                             <img src="{% static 'contents/comment.png' %}" alt="Comment Icon" class="icon-comment">
                         </div>
-                        <div class="count">{{ post.comments.count }}</div>
+                        <div class="count comment-count">{{ post.comments.count }}</div> <!-- comment-count 클래스를 추가 -->
                     </div>
                 </div>
-                <div class="divider"></div> <!-- 각 포스트 사이의 구분선 -->
+                <div class="divider"></div>
             </div>
         </div>
         {% endfor %}
@@ -158,15 +157,14 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    var createModal = document.getElementById('post-create-modal');
-    var createInputField = document.getElementById('post-create-input');
-    var createCloseBtn = document.getElementById('modal-close-create');
-    var createImgBtn = document.getElementById('modal-img-button');
-    var createImageInput = document.getElementById('image-input');
-    var createFileInfo = document.getElementById('file-info');
-    var createSubmitBtn = document.getElementById('modal-submit-button');
-    var joinButton = document.getElementById('join-community');
+document.addEventListener('DOMContentLoaded', function() {
+    var inputField = document.getElementById('post-create-input');
+    var modal = document.getElementById('post-create-modal');
+    var closeBtn = document.getElementById('modal-close-create');
+    var imgBtn = document.getElementById('modal-img-button');
+    var imageInput = document.getElementById('image-input');
+    var fileInfo = document.getElementById('file-info');
+    var submitBtn = document.getElementById('modal-submit-button');
 
     var detailModal = document.getElementById('postModal');
     var detailCloseBtn = document.getElementById('modal-close-detail');
@@ -174,79 +172,73 @@
     var commentsContainer = document.getElementById('commentsContainer');
     var submitComment = document.getElementById('submitComment');
 
-    // Create Post 모달 로직
-    createModal.classList.add('hidden');
-    createModal.style.display = "none";  // 모달을 숨김
+    modal.classList.add('hidden');
+    modal.style.display = "none";
 
-    if (createInputField) {
-        createInputField.addEventListener('click', function() {
-            createModal.classList.remove('hidden');
-            createModal.style.display = "flex";  // 모달을 표시
+    if (inputField) {
+        inputField.addEventListener('click', function() {
+            modal.classList.remove('hidden');
+            modal.style.display = "flex";
         });
     }
 
-    if (createCloseBtn) {
-        createCloseBtn.addEventListener('click', function() {
-            createModal.classList.add('hidden');
-            createModal.style.display = "none";  // 모달을 숨김
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+            modal.style.display = "none";
         });
     }
 
-    if (createImgBtn) {
-        createImgBtn.addEventListener('click', function() {
-            createImageInput.click();  // 파일 선택 창을 엽니다.
+    if (imgBtn) {
+        imgBtn.addEventListener('click', function() {
+            imageInput.click();
         });
     }
 
-    createImageInput.addEventListener('change', function() {
-        var files = createImageInput.files;
+    imageInput.addEventListener('change', function() {
+        var files = imageInput.files;
         if (files.length > 3) {
             alert("최대 3개의 이미지만 선택할 수 있습니다.");
-            createImageInput.value = "";  // 파일 선택 초기화
+            imageInput.value = "";
         } else {
             displayFileInfo(files);
         }
     });
 
     function displayFileInfo(files) {
-        createFileInfo.innerHTML = '';  // 기존 파일 정보 초기화
+        fileInfo.innerHTML = '';
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
             var fileElement = document.createElement('div');
             fileElement.textContent = file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
-            createFileInfo.appendChild(fileElement);
+            fileInfo.appendChild(fileElement);
         }
     }
 
-    createSubmitBtn.addEventListener('click', function() {
+    submitBtn.addEventListener('click', function() {
         var formData = new FormData();
         formData.append('content', document.getElementById('modal-editor').value);
         
-        var files = createImageInput.files;
+        var files = imageInput.files;
         for (var i = 0; i < files.length; i++) {
             formData.append('images', files[i]);
         }
 
         formData.append('team_id', document.getElementById('team-id').value);
 
-        fetch("{% url 'create_post_user' %}", {
+        fetch("{% if request.user.role == 'user' %}{% url 'create_post_user' %}{% else %}{% url 'create_post_user' %}{% endif %}", {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
             },
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                createModal.classList.add('hidden');
-                createModal.style.display = "none";  // 모달을 숨김
-                location.reload();  // 페이지를 새로고침하여 새로운 포스트를 표시
+                modal.classList.add('hidden');
+                modal.style.display = "none";
+                location.reload();
             } else {
                 alert('포스트 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
             }
@@ -258,13 +250,12 @@
     });
 
     window.addEventListener('click', function(event) {
-        if (event.target === createModal) {
-            createModal.classList.add('hidden');
-            createModal.style.display = "none";  // 모달을 숨김
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+            modal.style.display = "none";
         }
     });
 
-    // 이미지 개수에 따라 그리드 클래스 추가
     var imageGrids = document.querySelectorAll('.post-images-grid');
     imageGrids.forEach(function(grid) {
         var imageCount = grid.getAttribute('data-image-count');
@@ -279,10 +270,11 @@
         }
     });
 
-    // Post Detail 모달 로직
     document.querySelectorAll('.container-297-post-details').forEach(postDetail => {
         postDetail.addEventListener('click', function() {
             var postId = postDetail.getAttribute('data-post-id');
+            var postModal = document.getElementById('postModal');
+            postModal.setAttribute('data-post-id', postId); // 포스트 ID 설정
             fetch(`/contents/post_detail/${postId}/`)
                 .then(response => response.json())
                 .then(data => {
@@ -293,10 +285,55 @@
                             <ul class="post-images-grid" data-image-count="${data.images.length}">
                                 ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image"></li>`).join('')}
                             </ul>
-                            <p>Likes: ${data.likes_count}</p>
-                            <p>User has liked: ${data.user_has_liked}</p>
+                            <p>
+                                Likes: <span id="likes-count">${data.likes_count}</span>
+                                <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
+                            </p>
                         </div>
                     `;
+
+                    var likeIcon = document.getElementById('like-icon');
+                    if (data.user_has_liked) {
+                        likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                    } else {
+                        likeIcon.src = "{% static 'contents/like.png' %}";
+                    }
+                    
+                    var mainLikeIcon = document.querySelector(`.icon-like[data-post-id="${postId}"]`);
+                    var mainLikesCount = mainLikeIcon.closest('.like-comment-container').querySelector('.count');
+                    
+                    likeIcon.addEventListener('click', function() {
+                        fetch(`/contents/post_detail/${postId}/add_like/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById('likes-count').textContent = data.likes_count;
+                                mainLikesCount.textContent = data.likes_count;
+                                if (data.user_has_liked) {
+                                    likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                                    mainLikeIcon.src = "{% static 'contents/like_liked.png' %}";
+                                    mainLikeIcon.setAttribute('data-liked', 'true');
+                                    likeIcon.setAttribute('data-liked', 'true');
+                                } else {
+                                    likeIcon.src = "{% static 'contents/like.png' %}";
+                                    mainLikeIcon.src = "{% static 'contents/like.png' %}";
+                                    mainLikeIcon.setAttribute('data-liked', 'false');
+                                    likeIcon.setAttribute('data-liked', 'false');
+                                }
+                            } else {
+                                alert('좋아요를 변경하는 데 실패했습니다.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred: ' + error.message);
+                        });
+                    });
 
                     var commentsHTML = data.comments.map(comment => `
                         <li>
@@ -305,7 +342,6 @@
                     `).join('');
                     commentsContainer.querySelector('ul').innerHTML = commentsHTML;
 
-                    // 이미지 개수에 따라 그리드 클래스 추가
                     var postImagesGrid = postModalContent.querySelector('.post-images-grid');
                     var postImageCount = postImagesGrid.getAttribute('data-image-count');
                     if (postImageCount == 1) {
@@ -318,7 +354,6 @@
                         postImagesGrid.classList.add('grid-4');
                     }
 
-                    detailModal.setAttribute('data-post-id', postId); // 모달에 post_id 설정
                     detailModal.style.display = 'block';
                 });
         });
@@ -330,7 +365,7 @@
 
     submitComment.addEventListener('click', function() {
         var postId = detailModal.getAttribute('data-post-id');
-        var commentText = document.getElementById('commentText').value.trim(); // 댓글 내용을 가져옵니다.
+        var commentText = document.getElementById('commentText').value.trim();
         
         if (!commentText) {
             alert('댓글 내용을 입력하세요.');
@@ -338,7 +373,7 @@
         }
 
         var formData = new FormData();
-        formData.append('content', commentText); // 댓글 내용을 FormData에 추가합니다.
+        formData.append('content', commentText);
 
         fetch(`/contents/post_detail/${postId}/add_comment/`, {
             method: 'POST',
@@ -354,6 +389,12 @@
                 newComment.innerHTML = `<strong>${data.username}</strong>: ${data.content}`;
                 commentsContainer.querySelector('ul').appendChild(newComment);
                 document.getElementById('commentText').value = '';
+
+                // 댓글 수 업데이트
+                var commentCountElement = document.querySelector(`.container-297-post-details[data-post-id="${postId}"] .icon-comment + .count`);
+                if (commentCountElement) {
+                    commentCountElement.textContent = parseInt(commentCountElement.textContent) + 1;
+                }
             } else {
                 alert('댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
             }
@@ -364,39 +405,34 @@
         });
     });
 
-
     window.addEventListener('click', function(event) {
         if (event.target === detailModal) {
             detailModal.style.display = 'none';
         }
     });
 
-    // 커뮤니티 가입하기 버튼 클릭 시 AJAX 요청을 보냅니다.
+    // 커뮤니티 가입하기 버튼 클릭 이벤트
+    var joinButton = document.getElementById('join-community');
     if (joinButton) {
-        joinButton.addEventListener('click', function() {
+        joinButton.addEventListener('click', function(e) {
+            e.preventDefault();
             var teamId = joinButton.getAttribute('data-team-id');
-            var formData = new FormData();
-            formData.append('team_id', teamId);
-
-            fetch("{% url 'join_team' %}", {
+            
+            fetch(`/contents/team/${teamId}/join/`, {
                 method: 'POST',
-                body: formData,
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
                 },
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('팀에 가입되었습니다.');
+                    alert('커뮤니티에 가입되었습니다.');
                     location.reload();
+                } else if (data.error === 'You are already a member of this team.') {
+                    alert('이미 커뮤니티에 가입되어 있습니다.');
                 } else {
-                    alert('팀 가입에 실패했습니다. ' + data.error);
+                    alert('커뮤니티 가입에 실패했습니다. ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
@@ -405,6 +441,7 @@
             });
         });
     }
+
 });
 </script>
 
