@@ -46,13 +46,13 @@
         cursor: pointer;
     }
 
-    #modalPlayerName{
+    .modalPlayerName{
         padding-top: 20px;
         font-size: 24px;
         font-weight: bold;
     }
 
-    #modalPlayerProfile {
+    .modalPlayerProfile {
         padding-top:50px;
         width: 150px;
         height: auto;
@@ -101,11 +101,11 @@
     }
 
     .modal-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 0 20px;
     }
 
     .modal-buttons button {
@@ -116,18 +116,28 @@
         font-weight: 1000;
     }
 
-    #cancelButton {
+    .cancelButton {
         background-color: transparent;
         color: #000;
         border: none; 
     }
 
-    #subscribeButton {
+
+    #urlmoveButton, #retryPaymentButton {
         background-color: transparent; 
         color: #28a745; 
         border: none; 
     }
 
+    .payment-status {
+        font-size: 24px;
+        font-weight: bold;
+        padding-top: 20px;
+    }
+
+    #modalSubscriptionPeriod {
+        padding-top:10px;
+    }
 
 </style>
 {% endblock extra-style %}
@@ -149,11 +159,11 @@
     {% endfor %}
     
     <!-- Modal -->
-    <div class="modal" id="playerModal">
+    <div class="modal" id="playerModal" style="display:none;">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <img id="modalPlayerProfile" alt="Player profile picture">
-            <div id="modalPlayerName"></div>
+            <img class="modalPlayerProfile" alt="Player profile picture">
+            <div class="modalPlayerName"></div>
             <div class="additional-info">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <circle cx="8" cy="8" r="7.5" stroke="#565E6D"/>
@@ -172,8 +182,8 @@
             </div>
             <div class="modal-buttons">
                 <form id="subscribeForm" method="get">
-                    <button type="button" id="cancelButton">취소</button>
-                    <button type="submit" id="subscribeButton">구독하기</button>
+                    <button type="button" class="cancelButton">취소</button>
+                    <button type="submit" id="urlmoveButton">구독하기</button>
                 </form>
             </div>
         </div>
@@ -183,14 +193,15 @@
 {% block extra-script %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var modal = document.getElementById('playerModal');
-        var modalPlayerName = document.getElementById('modalPlayerName');
-        var modalPlayerProfile = document.getElementById('modalPlayerProfile');
+        var modal = document.querySelector('.modal');
         var triggers = document.querySelectorAll('.player-trigger');
         var closeModalButton = document.querySelector('.close');
-        var cancelButton = document.getElementById('cancelButton');
-        var subscribeButton = document.getElementById('subscribeButton');
+        var cancelButton = document.querySelector('.cancelButton');
+        var subscribeButton = document.getElementById('urlmoveButton');
         var subscribeForm = document.getElementById('subscribeForm');
+        
+        var modalPlayerName = document.querySelector('.modalPlayerName');
+        var modalPlayerProfile = document.querySelector('.modalPlayerProfile');
 
         modal.style.display = "none";
 
@@ -210,19 +221,14 @@
                     modalPlayerProfile.style.display = 'none';
                 }
 
-
-                modal.style.display = "block";
-
+                modal.style.display = "flex";
                 subscribeForm.setAttribute('action', playerUrl);
-
-
             });
         });
 
         closeModalButton.addEventListener('click', function() {
             modal.style.display = "none";
         });
-
 
         cancelButton.addEventListener('click', function() {
             modal.style.display = "none";
@@ -237,8 +243,6 @@
                 modal.style.display = "none";
             }
         });
-
-
     });
 </script>
 {% endblock extra-script %}
