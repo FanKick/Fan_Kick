@@ -5,27 +5,42 @@
     background: white;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start !important;
 }
 
 .container-297 .container-297-inner {
     width: 80%;  /* 기존 1440px 대신 비율로 변경 */
     max-width: 1440px;  /* 최대 너비 설정 */
     height: auto;
-    position: relative;
+    position: relative !important;
     background: white;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
 }
 
 .container-297 .container-297-post {
-    width: 100%;  /* 702px 대신 100% */
+    width: 70%;  /* 702px 대신 100% */
     margin-bottom: 20px;
     position: relative;
     display: flex;
     flex-direction: column;
+}
+
+.container-297 .container-297-space {
+    width: 10%; /* 빈 공간의 너비 */
+}
+
+.container-297 .container-297-team {
+    width: 20%;
+    position: sticky;
+    display: flex;
+    top : 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100vh; /* 전체 높이를 화면 높이에 맞추기 */
 }
 
 .container-297 .container-297-profile {
@@ -161,6 +176,60 @@
     height: 100px; /* 원하는 높이로 조정 */
 }
 
+/* 팀 이미지 스타일 */
+.container-297 .team-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* 팀 배지 스타일 */
+.container-297 .fc-seoul-badge {
+    padding: 12px 39px;
+    background: linear-gradient(90deg, #006600 0%, #66FF66 100%);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-297 .fc-seoul-text {
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 700;
+    line-height: 28px;
+}
+
+/* 커뮤니티 버튼 스타일 */
+.container-297 .community-button {
+    padding: 10px 30px; /* FC 서울 버튼보다 살짝 작게 조정 */
+    background: linear-gradient(90deg, #006600 0%, #66FF66 100%);
+    border-radius: 100px;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    margin-top: auto; /* 자동으로 아래쪽에 위치 */
+    margin-bottom: 10px; /* 아래쪽 여백 추가 */
+}
+
+.container-297 .community-button-text {
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    font-family: 'Pretendard GOV Variable';
+    font-weight: 700;
+    line-height: 28px;
+}
+
+/* 여백 추가를 위한 스타일 */
+.container-297 .empty-space {
+    height: 100px; /* 원하는 높이로 조정 */
+}
+
 /* 기본 이미지 그리드 스타일 */
 .post-images-grid {
     display: grid;
@@ -221,4 +290,5 @@
 
 .post-images-grid.grid-1 .post-image-item {
     grid-column: 1 / 2;
+    width: 70%; /* 이미지 크기를 70%로 줄임 */
 }

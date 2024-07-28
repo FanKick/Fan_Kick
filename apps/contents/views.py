@@ -9,17 +9,22 @@ from .forms import PostForm, ImageForm, CommentForm
 from django.http import JsonResponse
 
 def post_detail_json(request, post_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': '로그인이 필요합니다.'}, status=401)
+
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.all()
     is_member = Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists()
     user_has_liked = Like.objects.filter(user=request.user, post=post).exists()
     likes_count = post.likes.count()
+    profile = post.user.profile.url if post.user.profile else None
 
     data = {
         'username': post.user.username,
+        'profile': profile,
         'content': post.content,
         'images': [image.image_url.url for image in post.images.all()],
-        'comments': [{'username': comment.user.username, 'content': comment.content} for comment in comments],
+        'comments': [{'id': comment.id, 'username': comment.user.username, 'content': comment.content} for comment in comments],
         'is_member': is_member,
         'user_has_liked': user_has_liked,
         'likes_count': likes_count,
@@ -65,6 +70,7 @@ class PlayerPostListView(ListView):
         context = super().get_context_data(**kwargs)
         team_id = self.kwargs['team_id']
         context['team_id'] = self.kwargs['team_id']
+        context['team'] = get_object_or_404(Team, id=team_id)
 
         # 현재 사용자에 대한 좋아요 상태 추가
         if self.request.user.is_authenticated:
@@ -72,7 +78,6 @@ class PlayerPostListView(ListView):
             context['user_likes'] = user_likes
         else:
             context['user_likes'] = []
-        
         
         return context
 
