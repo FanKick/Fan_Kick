@@ -508,6 +508,10 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/contents/post_detail/${postId}/`)
             .then(response => response.json())
             .then(data => {
+              console.log('data.comments:', data.comments); // 디버깅 메시지
+              data.comments.forEach(comment => {
+                    console.log('comment:', comment); // 각 댓글 객체 디버깅 메시지
+                });
                 const postModalContent = document.getElementById('postModalContent');
                 postModalContent.innerHTML = `
                     <div class="post-modal-content">
@@ -564,9 +568,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     </li>
                 `).join('');
                 document.getElementById('commentsList').innerHTML = commentsHTML;
+                console.log('commentsHTML:', commentsHTML); // 디버깅 메시지
 
                 document.getElementById('postModal').style.display = 'block';
                 document.getElementById('postModal').setAttribute('data-post-id', postId); // postId 설정
+
 
                 if (commentId) {
                     const commentElement = document.getElementById(`comment-${commentId}`);
@@ -630,3 +636,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 {% endblock %}
+

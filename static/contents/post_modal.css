@@ -115,6 +115,7 @@
     height: auto; /* 이미지 비율을 유지 */
 }
 
+
 /* 댓글 강조 */
 .highlight {
   background-color: #7ff87f; /* 연한 녹색 배경색 */
@@ -161,3 +162,4 @@
     height: 100%;
     object-fit: cover;
 }
+

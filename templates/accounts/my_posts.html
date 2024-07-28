@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/accounts/my_posts.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="main-content">
+    <div class="user-info-container">
+        <div class="user-info-sidebar">
+            <ul class="user-info-menu">
+                <li><a href="{% url 'accounts:update_user_info' %}" class="btn-user-info"><i class="fas fa-user"></i> 회원정보</a></li>
+                <li><a href="{% url 'subscriptions:subscription_management' %}" class="btn-subscription"><i class="fas fa-bell"></i> 구독관리</a></li>
+                <li><a href="{% url 'accounts:my_community' %}" class="btn-community"><i class="fas fa-users"></i> 커뮤니티 관리</a></li>
+            </ul>
+        </div>
+
+        <div class="user-info-content">
+            <h2>내가 쓴 게시글</h2>
+                <div class="community-info-sidebar">
+                  <a href="{% url 'accounts:my_community' %}" id="community-list-btn" class="btn">가입 커뮤니티 목록</a>
+                  <a href="{% url 'accounts:my_posts' %}" id="my-posts-btn" class="btn active">내가 쓴 게시글</a>
+                  <a href="{% url 'accounts:my_comments' %}" id="my-comments-btn" class="btn">내가 쓴 댓글</a>
+                </div>
+              
+              <table id="content-table">
+                  <thead>
+                      <tr>
+                          <th>No.</th>
+                          <th>게시된 커뮤니티</th>
+                          <th>게시글 내용</th>
+                          <th>게시 날짜</th>
+                          <th> </th>
+                      </tr>
+                  </thead>
+                  <tbody id="subscription-list">
+                      {% for post in page_obj %}
+                      <tr>
+                          <td>{{ post.number }}</td>
+                          <td>{{ post.team.team_name }}</td>
+                          <td>
+                              {% if post.type == 'player' %}
+                                  <a href="{% url 'contents:player_post_list' post.team.id %}?post_id={{ post.id }}">{{ post.content|slice:":5" }}...</a>
+                              {% else %}
+                                  <a href="{% url 'contents:user_post_list' post.team.id %}?post_id={{ post.id }}">{{ post.content|slice:":5" }}...</a>
+                              {% endif %}
+                          </td>
+                          <td>{{ post.created_at|date:"Y.m.d" }}</td>
+                          <td>
+                            <form method="post" action="{% url 'accounts:delete_post' post.id %}" class="delete-form">
+                                {% csrf_token %}
+                                <button type="button" class="btn-delete" onclick="openModal({{ post.id }})">
+                                  <i class="fa-regular fa-trash-can"></i></button>
+                            </form>
+
+                            <div id="delete-modal-{{ post.id }}" class="modal" >
+                                <div class="modal-content">
+                                    <span class="close" onclick="closeModal({{ post.id }})">&times;</span>
+                                    <p>정말로 해당 게시글을 삭제하시겠습니까?</p>
+                                    <form method="post" action="{% url 'accounts:delete_post' post.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-delete-confirm">확인</button>
+                                        <button type="button" class="btn-delete-cancel" onclick="closeModal({{ post.id }})">취소</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      {% if not page_obj %}
+                      <tr>
+                          <td colspan="5" style="text-align: center; height: 50px;">게시글이 없습니다.</td>
+                      </tr>
+                      {% endif %}
+                  </tbody>
+              </table>
+              <div class="pagination">
+                  <span class="step-links">
+                      {% if page_obj.has_previous %}
+                          <a href="?page=1">&laquo; 처음</a>
+                          <a href="?page={{ page_obj.previous_page_number }}">이전</a>
+                      {% endif %}
+                      <span class="current">
+                          페이지 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                      </span>
+                      {% if page_obj.has_next %}
+                          <a href="?page={{ page_obj.next_page_number }}">다음</a>
+                          <a href="?page={{ page_obj.paginator.num_pages }}">마지막 &raquo;</a>
+                      {% endif %}
+                  </span>
+              </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  function openModal(postId) {
+      document.getElementById('delete-modal-' + postId).style.display = 'block';
+  }
+  
+  function closeModal(postId) {
+      document.getElementById('delete-modal-' + postId).style.display = 'none';
+  }  
+  </script>
+{% endblock %}

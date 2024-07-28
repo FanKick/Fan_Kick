@@ -66,7 +66,30 @@ def payment_check(request, pk):
     # 결제 성공시 구독 등록
     payment.create_subscription_if_paid()
 
-    return redirect("payments:payment_detail", pk=pk)
+    player_info = {
+        'player_name': payment.player.player_name,
+        'player_profile_image': payment.player.user.profile.url if payment.player.user.profile else None,
+    }
+    
+    response_data = {
+        'is_paid': payment.is_paid,
+        'player_info': player_info,
+    }
+    
+    if payment.is_paid:
+        subscription = Subscription.objects.filter(
+            subscriber=payment.user, 
+            subscribed_to_player=payment.player, 
+            plan=payment.plan
+        ).first()
+        if subscription:
+            response_data['player_info'].update({
+                'subscription_start': subscription.start_date.strftime('%Y-%m-%d'),
+                'subscription_end': subscription.end_date.strftime('%Y-%m-%d'),
+            })
+    
+    return JsonResponse(response_data)
+    # return redirect("payments:payment_detail", pk=pk")
 
 
 def payment_detail(request, pk):

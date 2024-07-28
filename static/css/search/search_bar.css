@@ -1,0 +1,52 @@
+/* CSS (search_bar.css) */
+.header-search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.header-search-bar {
+    width: 301px;
+    height: 35px;
+    background: #F3F4F6;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.search-bar-icon {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.search-bar-icon img {
+    width: 16px;
+    height: 16px;
+}
+
+.search-bar-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    background: none;
+    color: #BCC1CA;
+    font-size: 14px;
+    font-family: 'Pretendard GOV Variable';
+    font-weight: 400;
+    line-height: 22px;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%; /* 검색 바 바로 아래에 위치 */
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    z-index: 1000; /* 검색 바와 겹치지 않도록 높은 z-index 설정 */
+}

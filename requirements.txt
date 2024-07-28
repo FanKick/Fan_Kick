@@ -4,6 +4,8 @@ billiard==4.2.0
 celery==5.4.0
 certifi==2024.7.4
 charset-normalizer==2.0.12
+billiard==4.2.0
+celery==5.4.0
 click==8.1.7
 click-didyoumean==0.3.1
 click-plugins==1.1.1
@@ -12,8 +14,9 @@ colorama==0.4.6
 cron-descriptor==1.4.3
 Django==5.0.6
 django-celery-beat==2.6.0
-django-ckeditor==6.7.1
 django-debug-toolbar==4.4.6
+django-timezone-field==7.0
+exceptiongroup==1.2.1
 django-extensions==3.2.3
 django-js-asset==2.2.0
 django-timezone-field==7.0
