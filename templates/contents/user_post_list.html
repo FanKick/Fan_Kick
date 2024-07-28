@@ -489,6 +489,144 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
-</script>
 
+document.addEventListener('DOMContentLoaded', function() {
+    function getQueryParam(param) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(param);
+    }
+
+    const postId = getQueryParam('post_id');
+    const commentId = getQueryParam('comment_id');
+    console.log('postId:', postId); // 디버깅 메시지
+    console.log('commentId:', commentId); // 디버깅 메시지
+    if (postId) {
+        openPostModal(postId, commentId);
+    }
+
+    function openPostModal(postId, commentId) {
+        fetch(`/contents/post_detail/${postId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const postModalContent = document.getElementById('postModalContent');
+                postModalContent.innerHTML = `
+                    <div class="post-modal-content">
+                        <h3>${data.username}</h3>
+                        <p>${data.content}</p>
+                        <ul class="post-images-grid" data-image-count="${data.images.length}">
+                            ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image"></li>`).join('')}
+                        </ul>
+                        <p>
+                            Likes: <span id="likes-count">${data.likes_count}</span>
+                            <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
+                        </p>
+                    </div>
+                `;
+
+                const likeIcon = document.getElementById('like-icon');
+                if (data.user_has_liked) {
+                    likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                } else {
+                    likeIcon.src = "{% static 'contents/like.png' %}";
+                }
+
+                likeIcon.addEventListener('click', function() {
+                    fetch(`/contents/post_detail/${postId}/add_like/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('likes-count').textContent = data.likes_count;
+                            if (data.user_has_liked) {
+                                likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                                likeIcon.setAttribute('data-liked', 'true');
+                            } else {
+                                likeIcon.src = "{% static 'contents/like.png' %}";
+                                likeIcon.setAttribute('data-liked', 'false');
+                            }
+                        } else {
+                            alert('좋아요를 변경하는 데 실패했습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred: ' + error.message);
+                    });
+                });
+
+                const commentsHTML = data.comments.map(comment => `
+                    <li id="comment-${comment.id}" class="${comment.id == commentId ? 'highlight' : ''}">
+                        <strong>${comment.username}</strong>: ${comment.content}
+                    </li>
+                `).join('');
+                document.getElementById('commentsList').innerHTML = commentsHTML;
+
+                document.getElementById('postModal').style.display = 'block';
+                document.getElementById('postModal').setAttribute('data-post-id', postId); // postId 설정
+
+                if (commentId) {
+                    const commentElement = document.getElementById(`comment-${commentId}`);
+                    console.log('commentElement:', commentElement); // 디버깅 메시지
+                    if (commentElement) {
+                        commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        commentElement.classList.add('highlight'); // 강조 클래스 추가
+
+                    }
+                }
+            });
+    }
+
+            // 기존 이벤트 리스너 제거 및 새로 등록
+            const submitCommentButton = document.getElementById('submitComment');
+            const newSubmitCommentButton = submitCommentButton.cloneNode(true);
+            submitCommentButton.parentNode.replaceChild(newSubmitCommentButton, submitCommentButton);
+
+            newSubmitCommentButton.addEventListener('click', function() {
+                const postId = document.getElementById('postModal').getAttribute('data-post-id');
+                const commentText = document.getElementById('commentText').value.trim();
+
+        if (!commentText) {
+            alert('댓글 내용을 입력하세요.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('content', commentText);
+
+        fetch(`/contents/post_detail/${postId}/add_comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const newComment = document.createElement('li');
+                newComment.innerHTML = `<strong>${data.username}</strong>: ${data.content}`;
+                document.getElementById('commentsList').appendChild(newComment);
+                document.getElementById('commentText').value = '';
+
+                // 댓글 수 업데이트
+                const commentCountElement = document.querySelector(`.container-297-post-details[data-post-id="${postId}"] .icon-comment + .count`);
+                if (commentCountElement) {
+                    commentCountElement.textContent = parseInt(commentCountElement.textContent) + 1;
+                }
+            } else {
+                alert('댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    });
+});
+
+</script>
 {% endblock %}
