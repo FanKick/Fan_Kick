@@ -19,10 +19,9 @@ app.autodiscover_tasks()
 def debug_task(self):
     print("Request: {0!r}".format(self.request))
 
-# 정기 작업 스케줄 정의
 app.conf.beat_schedule = {
-       'update-subscription-status-every-day': {
-           'task': 'apps.subscriptions.tasks.update_subscription_status',
-           'schedule': crontab(hour=0, minute=0),  # 매일 자정에 실행
-       },
-   }
+    'update-subscription-status-every-day': {
+        'task': 'update-subscription-status-every-day',
+        'schedule': crontab(hour=0, minute=0),  # 매일 자정에 실행
+    },
+}
