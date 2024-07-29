@@ -18,7 +18,6 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    var closeModalButtons = document.querySelectorAll('.close');
     var cancelButtons = document.querySelectorAll('.cancelButton');
     var retryPaymentButton = document.getElementById('retryPaymentButton');
 
@@ -30,11 +29,6 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        closeModalButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                closeModal(this.getAttribute('data-modal-id'));
-            });
-        });
 
 
         // cancelButtons.forEach(function(button) {
@@ -146,7 +140,6 @@
 <!-- 결제성공 모달 -->
 <div class="modal" id="success-modal" style="display:none;">
     <div class="modal-content">
-        <span class="close" data-modal-id="success-modal">&times;</span>
         <div class="payment-status">결제완료</div>
         <img class="modalPlayerProfile" alt="Player profile picture">
         <div class="modalPlayerName"></div>
@@ -169,11 +162,17 @@
 <!-- 결제실패 모달 -->
 <div class="modal" id="failure-modal" style="display:none;">
     <div class="modal-content">
-        <span class="close" data-modal-id="failure-modal">&times;</span>
         <div class="payment-status">결제실패</div>
         <img class="modalPlayerProfile" alt="Player profile picture">
         <div class="modalPlayerName"></div>
-        <p>결제에 실패했습니다. 다시 시도해주세요.</p>
+        <div class="payment-title">결제에 실패했습니다. 다시 시도해주세요</div>
+        <div class="notice">
+            <ul>
+                <li>FANKICK은 K-LEAGUE 팬들을 위한 특별한 서비스이며 선택한 축구선수가 직접 보내는 메시지를 수신할 수 있습니다.</li>
+                <li>구독 기간 동안 축구선수와 팬들이 메시지를 주고 받으며 소통할 수 있는 특별한 서비스를 제공합니다.</li>
+                <li>구독한 축구선수가 직접 작성한 개성 넘치는 메시지, 사진 등의 다양한 콘텐츠를 프라이빗한 메시지로 받아보세요.</li>
+            </ul>
+        </div>
         <div class="modal-buttons">
             <button type="button" class="cancelButton">홈으로</button>
             <button type="button" id="retryPaymentButton">결제 다시하기</button>
