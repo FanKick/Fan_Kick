@@ -211,3 +211,104 @@
     color: black ; /* 호버 시 글자색 변경 없음 */
     text-decoration: none ; /* 밑줄 제거 */
 }
+
+/* 기존 스타일 정의를 유지하고 필요한 스타일을 추가 */
+
+.info-player-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: black;
+}
+
+.info-player-main {
+    width: 1000px;
+    margin-bottom: 50px;
+}
+
+.info-player-image-section {
+    width: 100%;
+    height: 646px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.info-player-image-overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.info-player-content {
+    display: flex;
+    align-items: flex-start;
+}
+
+.info-player-profile {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-player-profile-picture {
+    width: 285px;
+    height: 488px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.info-player-details {
+    flex: 2;
+    margin-left: 50px;
+    color: white;
+}
+
+.info-player-team-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-player-team-logo img {
+    height: 141px;
+    object-fit: contain;
+}
+
+.info-player-team-name {
+    font-size: 20px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-player-description {
+    font-size: 16px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-player-stats {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-player-stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.info-player-stat-label, .info-player-stat-value {
+    font-size: 12px;
+    font-family: 'Pretendard GOV Variable', sans-serif;
+    font-weight: 500;
+    line-height: 30px;
+}

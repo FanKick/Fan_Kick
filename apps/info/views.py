@@ -1,83 +1,42 @@
-# apps/info/views.py
+from django.shortcuts import render, get_object_or_404
+from apps.info.models import TeamInfo
+from apps.accounts.models import Player
 
 from django.shortcuts import render, get_object_or_404
-from apps.accounts.models import Player, Team
-from .models import TeamInfo
+from .models import PlayerInfo
 
-def team_info_by_team_name_search(request, team_name_search):
-    team_info = get_object_or_404(TeamInfo, team_name_search=team_name_search)
-    players_fw = Player.objects.filter(team=team_info.team, position='FW')
-    players_mf = Player.objects.filter(team=team_info.team, position='MF')
-    players_df = Player.objects.filter(team=team_info.team, position='DF')
-    players_gk = Player.objects.filter(team=team_info.team, position='GK')
-    return render(request, 'info/team_info_detail.html', {
+def player_detail(request, info_player_name):
+    player_info = get_object_or_404(PlayerInfo, info_player_name=info_player_name)
+    player = player_info.player
+    team_info = player.team.team_info
+
+    context = {
+        'player': player,
+        'player_info': player_info,
+        'team': player.team,
         'team_info': team_info,
-        'team': team_info.team,
+    }
+    return render(request, 'info/player_info_detail.html', context)
+
+
+def team_info_by_info_team_name(request, info_team_name):
+    # team_name_search 값을 기반으로 TeamInfo 객체를 조회
+    team_info = get_object_or_404(TeamInfo, info_team_name=info_team_name)
+    team = team_info.team
+
+    # 포지션별 선수 목록 가져오기
+    players_fw = Player.objects.filter(team=team, position='FW')
+    players_mf = Player.objects.filter(team=team, position='MF')
+    players_df = Player.objects.filter(team=team, position='DF')
+    players_gk = Player.objects.filter(team=team, position='GK')
+
+    context = {
+        'team_info': team_info,
+        'team': team,
         'players_fw': players_fw,
         'players_mf': players_mf,
         'players_df': players_df,
         'players_gk': players_gk,
-    })
+    }
 
-
-# def team_info_by_team_name_search(request, team_name_search):
-#     team_info = get_object_or_404(TeamInfo, team_name_search=team_name_search)
-#     return render(request, 'info/team_info_detail.html', {'team_info': team_info, 'team': team_info.team})
-
-def team_info_by_player_name(request, player_name_search):
-    player = get_object_or_404(Player, player_name__iexact=player_name_search)
-    team_info = get_object_or_404(TeamInfo, team=player.team)
-    return render(request, 'info/team_info_detail.html', {'team_info': team_info, 'team': team_info.team})
-
-
-def team_info_by_team_name(request, team_name):
-    # team_name을 통해 해당 팀을 찾습니다.
-    team = get_object_or_404(Team, team_name__iexact=team_name)
-    # 팀 정보를 가져옵니다.
-    team_info = get_object_or_404(TeamInfo, team=team)
-    players_fw = Player.objects.filter(team=team_info.team, position='FW')
-    players_mf = Player.objects.filter(team=team_info.team, position='MF')
-    players_df = Player.objects.filter(team=team_info.team, position='DF')
-    players_gk = Player.objects.filter(team=team_info.team, position='GK')
-    return render(request, 'info/team_info_detail.html', {
-        'team_info': team_info,
-        'team': team_info.team,
-        'players_fw': players_fw,
-        'players_mf': players_mf,
-        'players_df': players_df,
-        'players_gk': players_gk,
-    })
-
-# def team_info_by_player_name(request, player_name):
-#     # player_name을 통해 해당 플레이어를 찾습니다.
-#     player = get_object_or_404(Player, player_name__iexact=player_name)
-#     # 플레이어의 팀 정보를 가져옵니다.
-#     team_info = get_object_or_404(TeamInfo, team=player.team)
-#     players_fw = Player.objects.filter(team=team_info.team, position='FW')
-#     players_mf = Player.objects.filter(team=team_info.team, position='MF')
-#     players_df = Player.objects.filter(team=team_info.team, position='DF')
-#     players_gk = Player.objects.filter(team=team_info.team, position='GK')
-#     return render(request, 'info/team_info_detail.html', {
-#         'team_info': team_info,
-#         'team': team_info.team,
-#         'players_fw': players_fw,
-#         'players_mf': players_mf,
-#         'players_df': players_df,
-#         'players_gk': players_gk,
-#     })
-
-
-def team_info_detail(request, pk):
-    team_info = get_object_or_404(TeamInfo, team__pk=pk)
-    players_fw = Player.objects.filter(team=team_info.team, position='FW')
-    players_mf = Player.objects.filter(team=team_info.team, position='MF')
-    players_df = Player.objects.filter(team=team_info.team, position='DF')
-    players_gk = Player.objects.filter(team=team_info.team, position='GK')
-    return render(request, 'info/team_info_detail.html', {
-        'team_info': team_info,
-        'team': team_info.team,
-        'players_fw': players_fw,
-        'players_mf': players_mf,
-        'players_df': players_df,
-        'players_gk': players_gk,
-    })
+    return render(request, 'info/team_info_detail.html', context)

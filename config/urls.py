@@ -29,8 +29,10 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('contents/', include('apps.contents.urls')),
     path('accounts/', include('apps.accounts.urls')),
-    path('team/<str:team_name_search>/', info_views.team_info_by_team_name_search, name='team_info_by_team_name_search'),
-    path('player/<str:player_name_search>/', info_views.team_info_by_player_name, name='team_info_by_player_name'),
+
+    path('team/<str:info_team_name>/', info_views.team_info_by_info_team_name, name='team_info_by_info_team_name'),
+    path('player/<str:info_player_name>/', info_views.player_detail, name='player_detail'),
+
     path('subscriptions/', include('apps.subscriptions.urls')),
     path('payments/', include('apps.payments.urls')),
     path('search/', include('apps.search.urls', namespace='search')),
