@@ -124,18 +124,40 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- 오른쪽 팀 섹션 -->
+    <div class="container-297-team">
+        <img src="{{ team.team_picture.url }}" alt="Team Image" class="team-image">
+        <div class="fc-seoul-badge">
+            <a href="{% url 'info:team_info_detail' team.id %}" class="fc-seoul-text">{{ team.team_name }}</a>
+        </div>
+        {% if request.user.is_authenticated and request.user|user_is_role:'user' %}
+        <a href="#" class="community-button" id="join-community" data-team-id="{{ team.id }}">
+            <span class="community-button-text">커뮤니티 가입하기</span>
+        </a>
+        {% else %}
+            <div class="community-button-placeholder"></div>
+        {% endif %}
+    </div>
 </div>
+
 
 <!-- Post Detail 모달 -->
 <div id="postModal" class="post_modal modal">
     <div class="modal-content">
-        <span class="close" id="modal-close-detail">&times;"></span>
+        <span class="close" id="modal-close-detail">&times;</span>
         <div class="modal-left">
             <div id="postModalContent"></div>
         </div>
         <div class="modal-right">
             <div id="commentsContainer">
-                <ul id="commentsList"></ul>
+                <ul id="commentsList">
+                    {% for comment in post.comments.all %}
+                    <li id="comment-{{ comment.id }}">
+                        <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
             <form id="commentForm">
                 <textarea id="commentText" placeholder="댓글을 입력하세요..."></textarea>
@@ -160,6 +182,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var postModalContent = document.getElementById('postModalContent');
     var commentsContainer = document.getElementById('commentsContainer');
     var submitComment = document.getElementById('submitComment');
+
+    var userIsAuthenticated = "{{ request.user.is_authenticated|yesno:'true,false' }}";
 
     modal.classList.add('hidden');
     modal.style.display = "none";
@@ -261,21 +285,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelectorAll('.container-297-post-details').forEach(postDetail => {
         postDetail.addEventListener('click', function() {
+            if (!userIsAuthenticated) {
+                alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+                window.location.href = "{% url 'accounts:login' %}"; // 로그인 페이지 URL로 리디렉션
+                return;
+            }
             var postId = postDetail.getAttribute('data-post-id');
+            var postModal = document.getElementById('postModal');
+            postModal.setAttribute('data-post-id', postId); // 포스트 ID 설정
             fetch(`/contents/post_detail/${postId}/`)
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 401) {
+                        throw new Error('로그인이 필요합니다.');
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    var profileImageUrl = data.profile ? data.profile :`{% static 'contents/Frame.png' %}`;
+                    
                     postModalContent.innerHTML = `
                         <div class="post-modal-content">
-                            <h3>${data.username}</h3>
-                            <p>${data.content}</p>
-                            <ul class="post-images-grid" data-image-count="${data.images.length}">
-                                ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image"></li>`).join('')}
-                            </ul>
-                            <p>
-                                Likes: <span id="likes-count">${data.likes_count}</span>
-                                <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
-                            </p>
+                            <div class="post-modal-header">
+                                <div class="post-modal-profile">
+                                    <div class="profile-button">
+                                        <div class="profile-icon-inner">
+                                            <img src="${profileImageUrl}" alt="Profile Image" class="profile-icon-inner-img" />
+                                        </div>
+                                    </div>
+                                    <h3 class="post-modal-username">${data.username}</h3>
+                                </div>
+                            </div>
+                            <div class="post-modal-body">
+                                <p class="post-modal-text">${data.content}</p>
+                                <ul class="post-images-grid" data-image-count="${data.images.length}">
+                                    ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image" /></li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="post-modal-footer">
+                                <p>
+                                    Likes: <span id="likes-count">${data.likes_count}</span>
+                                    <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
+                                </p>
+                            </div>
                         </div>
                     `;
 
@@ -347,6 +398,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     detailModal.style.display = 'block';
+                })
+                .catch(error => {
+                    alert(error.message);
+                    window.location.href = "{% url 'accounts:login' %}"; // 로그인 페이지 URL로 리디렉션
                 });
         });
     });
@@ -356,6 +411,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     submitComment.addEventListener('click', function() {
+        if (!userIsAuthenticated) {
+            alert('로그인이 필요합니다.');
+            window.location.href = "{% url 'accounts:login' %}"; // 로그인 페이지 URL로 리디렉션
+            return;
+        }
         var postId = submitComment.getAttribute('data-post-id'); // 이 부분에서 post_id를 가져옴
         var commentText = document.getElementById('commentText').value.trim();
         
@@ -396,10 +456,37 @@ document.addEventListener('DOMContentLoaded', function() {
             detailModal.style.display = 'none';
         }
     });
+    // 커뮤니티 가입하기 버튼 클릭 이벤트
+    var joinButton = document.getElementById('join-community');
+    if (joinButton) {
+        joinButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            var teamId = joinButton.getAttribute('data-team-id');
+            
+            fetch(`/contents/team/${teamId}/join/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('커뮤니티에 가입되었습니다.');
+                    location.reload();
+                } else if (data.error === 'You are already a member of this team.') {
+                    alert('이미 커뮤니티에 가입되어 있습니다.');
+                } else {
+                    alert('커뮤니티 가입에 실패했습니다. ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+        });
+    }
 });
-
-
-
 
 document.addEventListener('DOMContentLoaded', function() {
     function getQueryParam(param) {
@@ -541,3 +628,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 {% endblock %}
+

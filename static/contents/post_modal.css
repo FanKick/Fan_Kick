@@ -120,5 +120,46 @@
 .highlight {
   background-color: #7ff87f; /* 연한 녹색 배경색 */
   padding: 5px; /* 강조된 댓글의 패딩 */
-  border-radius: 5px; /* 강조된 댓글의 모서리 둥글게 */
+  border-radius: 5px;  /* 강조된 댓글의 모서리 둥글게 */
 }
+
+.post-modal-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.post-modal-profile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.profile-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: #9095A0;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.profile-icon-inner {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #9095A0;
+}
+
+.profile-icon-inner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
