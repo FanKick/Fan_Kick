@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 from django.conf import settings
+from apps.info import views as info_views 
 
 urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
@@ -28,10 +29,12 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('contents/', include('apps.contents.urls')),
     path('accounts/', include('apps.accounts.urls')),
-    path('info/', include('apps.info.urls')), # jihyun
+    path('team/<str:team_name_search>/', info_views.team_info_by_team_name_search, name='team_info_by_team_name_search'),
+    path('player/<str:player_name_search>/', info_views.team_info_by_player_name, name='team_info_by_player_name'),
     path('subscriptions/', include('apps.subscriptions.urls')),
     path('payments/', include('apps.payments.urls')),
     path('search/', include('apps.search.urls', namespace='search')),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
