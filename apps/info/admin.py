@@ -3,5 +3,4 @@ from .models import TeamInfo
 
 @admin.register(TeamInfo)
 class TeamInfoAdmin(admin.ModelAdmin):
-    list_display = ('team_name', 'created_at', 'updated_at')
-    search_fields = ('team_name',)
+    list_display = ('team', 'info_team_name')
