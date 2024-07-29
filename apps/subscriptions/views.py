@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .models import Subscription
+from apps.accounts.models import Player
 
 @login_required
 def subscription_management(request):
@@ -20,3 +21,16 @@ def subscription_management(request):
         subscription.number = len(subscriptions_list) - (subscriptions.start_index() + index - 1) + 1
     
     return render(request, 'accounts/subscription_management.html', {'subscriptions': subscriptions})
+
+def unsubscribed_players(request):
+    # 현재 로그인한 사용자가 구독한 선수들의 목록을 가져옵니다.
+    subscribed_players = Subscription.objects.filter(subscriber=request.user).values_list('subscribed_to_player', flat=True)
+
+    # 구독하지 않은 선수들의 목록을 가져옵니다.
+    unsubscribed_players = Player.objects.exclude(id__in=subscribed_players)
+
+    context = {
+        'players' : unsubscribed_players
+    }
+
+    return render(request, 'payments/pay_home.html', context)
