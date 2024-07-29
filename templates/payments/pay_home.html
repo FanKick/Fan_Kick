@@ -17,11 +17,11 @@
             {% if player.user.profile %}
                 <img class="player-image player-trigger" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}'s profile picture"
                      data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
-                     data-player-profile="{{ player.user.profile.url }}" data-url="{% url 'payments:subsctiption_pay' pk=player.id %}">
+                     data-player-profile="{{ player.user.profile.url }}" data-url="{% url 'payments:subscription_pay' pk=player.id %}">
             {% else %}
                 <img class="player-image player-trigger" src="" alt="Default player image"
                      data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
-                     data-player-profile="" data-url="{% url 'payments:subsctiption_pay' pk=player.id %}">
+                     data-player-profile="" data-url="{% url 'payments:subscription_pay' pk=player.id %}">
             {% endif %}
             <img class="team-logo" src="{{ player.team.team_picture.url }}" alt="{{ player.team.team_name }}">
             <div class="player-info">
