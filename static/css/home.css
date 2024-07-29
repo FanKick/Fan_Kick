@@ -120,11 +120,11 @@ a {
 }
 
 .player-item .player-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
+    width: 150px;
+    height: auto;
     border-radius: 10px;
 }
+
 
 .player-item .team-logo {
     width: 50px;
@@ -132,7 +132,7 @@ a {
     border-radius: 50%;
     object-fit: cover;
     position: absolute;
-    top: 130px;
+    top: 180px;
     left: 50%;
     transform: translateX(-50%);
     border: 2px solid white;
