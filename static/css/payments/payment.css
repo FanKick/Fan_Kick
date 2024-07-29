@@ -86,6 +86,13 @@
     font-weight: bold;
 }
 
+.payment-title {
+    margin: 50px 0;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
 .notice ul {
     list-style: disc;
 }
@@ -108,7 +115,7 @@
     padding: 10px 20px;
     font-size: 20px;
     border: none;
-    margin: 20px 80px;
+    margin: 30px 80px;
     font-weight: 1000;
 }
 
