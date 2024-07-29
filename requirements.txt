@@ -1,5 +1,12 @@
 amqp==5.2.0
 asgiref==3.8.1
+<<<<<<< HEAD
+=======
+billiard==4.2.0
+celery==5.4.0
+certifi==2024.7.4
+charset-normalizer==2.0.12
+>>>>>>> main
 billiard==4.2.0
 celery==5.4.0
 certifi==2024.7.4
@@ -16,14 +23,26 @@ django-debug-toolbar==4.4.6
 django-extensions==3.2.3
 django-timezone-field==7.0
 exceptiongroup==1.2.1
+<<<<<<< HEAD
+=======
+django-extensions==3.2.3
+django-js-asset==2.2.0
+django-timezone-field==7.0
+exceptiongroup==1.2.1
+>>>>>>> main
 iamport-rest-client==0.9.0
 idna==3.7
 iniconfig==2.0.0
 kombu==5.3.7
+<<<<<<< HEAD
+=======
+load-dotenv==0.1.0
+>>>>>>> main
 packaging==24.1
 pillow==10.4.0
 pluggy==1.5.0
 prompt_toolkit==3.0.47
+psycopg2==2.9.9
 psycopg2-binary==2.9.9
 pytest==8.2.2
 python-crontab==3.2.0
@@ -37,4 +56,8 @@ typing_extensions==4.12.2
 tzdata==2024.1
 urllib3==1.26.19
 vine==5.1.0
+<<<<<<< HEAD
 wcwidth==0.2.13
+=======
+wcwidth==0.2.13
+>>>>>>> main

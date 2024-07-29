@@ -33,7 +33,9 @@
 
             <!-- DM Icon -->
             <div class="header-nav-item header-profile-icon">
-                <img src="{% static 'images/dm_icon.svg' %}" alt="DM Icon">
+                <a href="{% url 'chattings:redirect_to_dm' %}">
+                    <img src="{% static 'images/dm_icon.svg' %}" alt="DM Icon">
+                </a>
             </div>
             
             <!-- Logout Button -->

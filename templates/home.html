@@ -1,7 +1,91 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block extra-style %} {% endblock extra-style %}
+{% block extra-style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+
+{% endblock extra-style %}
 
 {% block content %}
+
+<div class="slider" id="team-slider">
+    {% for team in teams %}
+        {% if team.team_picture %}
+            <div class="team-image">
+                <a href="{% url 'info:team_info_detail' pk=team.id %}">
+                    <img src="{{ team.team_picture.url }}" alt="{{ team.team_name }}">
+                </a>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+
+{% if user.is_authenticated %}
+    <div class="community-section">
+        <div class="section-title"><h2>나의 커뮤니티</h2></div>
+        {% for membership in memberships %}
+            <div class="community-item">
+                <a href="{% url 'contents:user_post_list' team_id=membership.team.id %}">
+                    {% if membership.team.team_info.team_club_picture %}
+                        <img src="{{ membership.team.team_info.team_club_picture.url }}" alt="{{ membership.team.team_name }}">
+                    {% else %}
+                        <img src="" alt="Default image">
+                    {% endif %}
+                    <img class="team-logo" src="{{ membership.team.team_picture.url }}" alt="{{ membership.team.team_name }}">
+                    <h3>{{ membership.team.team_name }}</h3>
+                    </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+<div class="player-section">
+    <div class="section-title"><h2>새로운 플레이어를 만나보세요!</h2></div>
+    {% for player in players %}
+        <div class="player-item">
+            {% if player.user.profile %}
+                <img class="player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+            {% else %}
+                <img class="player-image" src="/path/to/default-player-image.jpg" alt="Default player image">
+            {% endif %}
+            <img class="team-logo" src="{{ player.team.team_picture.url }}" alt="{{ player.team.team_name }}">
+            <div class="player-info">
+                <p>{{ player.team.team_name }}</p>
+                <h3>{{ player.player_name }}</h3>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
+
+
+
 {% endblock content %}
+
+
+{% block extra-script %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#team-slider').slick({
+                dots: true,
+                infinite: true,
+                speed: 500,
+                slidesToShow: 3,
+                slidesToScroll: 1,
+                arrows: true,
+            });
+
+
+        });
+    </script>
+{% endblock extra-script %}
 
