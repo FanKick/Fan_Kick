@@ -1,70 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block extra-style %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
-<style>
-    .slider {
-        width: 80%;
-        margin: 50px auto;
-    }
-    .slick-slide img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    .team-image {
-        width: 200px;
-        height: 200px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-    }
-
-    .community-section {
-        background-color: #d3d7dd; 
-        padding: 20px;
-        text-align: center;
-        margin-top: 100px;
-    }
-
-    .community-item {
-        display: inline-block;
-        width: 200px;
-        margin: 10px;
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        text-align: center;
-        position: relative; /* 로고 위치 조정을 위해 추가 */
-    }
-
-    .community-item img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-    }
-
-    .community-item .team-logo {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        position: absolute;
-        top: 130px; /* 팀 클럽 사진 아래에 로고 위치 조정 */
-        left: 50%;
-        transform: translateX(-50%);
-        border: 3px solid white;
-        background-color: #fff;
-    }
-
-    .community-item h3 {
-        margin-top: 60px; 
-    }
-</style>
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
 
 {% endblock extra-style %}
 
@@ -74,7 +14,9 @@
     {% for team in teams %}
         {% if team.team_picture %}
             <div class="team-image">
-                <img src="{{ team.team_picture.url }}" alt="{{ team.team_name }}">
+                <a href="{% url 'info:team_info_detail' pk=team.id %}">
+                    <img src="{{ team.team_picture.url }}" alt="{{ team.team_name }}">
+                </a>
             </div>
         {% endif %}
     {% endfor %}
@@ -82,21 +24,43 @@
 
 
 {% if user.is_authenticated %}
-<div class="community-section">
-    <h2>나의 커뮤니티</h2>
-    {% for membership in memberships %}
-        <div class="community-item">
-            {% if membership.team.team_info.team_club_picture %}
-                <img src="{{ membership.team.team_info.team_club_picture.url }}" alt="{{ membership.team.team_name }}">
+    <div class="community-section">
+        <div class="section-title"><h2>나의 커뮤니티</h2></div>
+        {% for membership in memberships %}
+            <div class="community-item">
+                <a href="{% url 'contents:user_post_list' team_id=membership.team.id %}">
+                    {% if membership.team.team_info.team_club_picture %}
+                        <img src="{{ membership.team.team_info.team_club_picture.url }}" alt="{{ membership.team.team_name }}">
+                    {% else %}
+                        <img src="" alt="Default image">
+                    {% endif %}
+                    <img class="team-logo" src="{{ membership.team.team_picture.url }}" alt="{{ membership.team.team_name }}">
+                    <h3>{{ membership.team.team_name }}</h3>
+                    </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+<div class="player-section">
+    <div class="section-title"><h2>새로운 플레이어를 만나보세요!</h2></div>
+    {% for player in players %}
+        <div class="player-item">
+            {% if player.user.profile %}
+                <img class="player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
             {% else %}
-                <img src="" alt="Default image">
+                <img class="player-image" src="/path/to/default-player-image.jpg" alt="Default player image">
             {% endif %}
-            <img class="team-logo" src="{{ membership.team.team_picture.url }}" alt="{{ membership.team.team_name }}">
-            <h3>{{ membership.team.team_name }}</h3>
+            <img class="team-logo" src="{{ player.team.team_picture.url }}" alt="{{ player.team.team_name }}">
+            <div class="player-info">
+                <p>{{ player.team.team_name }}</p>
+                <h3>{{ player.player_name }}</h3>
+            </div>
         </div>
     {% endfor %}
 </div>
-{% endif %}
+
 
 
 

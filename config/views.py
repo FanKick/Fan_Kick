@@ -1,21 +1,22 @@
 from django.shortcuts import render
-from apps.accounts.models import Team, Membership
+from apps.accounts.models import Team, Player, Membership
 from apps.info.models import TeamInfo
 
 def home(request):
     user = request.user
     teams = Team.objects.all()
-    teaminfos = TeamInfo.objects.all()
+
+    players = Player.objects.select_related('user', 'team').all()
 
     if user.is_authenticated:
         memberships = Membership.objects.filter(user=user, is_active=True).select_related('team')
     else:
-        memberships = []
+        memberships = None
 
     context = {
         'teams': teams,
-        'teaminfos': teaminfos,
         'memberships': memberships,
+        'players' : players,
     }
 
 
