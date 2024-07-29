@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+FAN KICK - {{ player.player_name }}
+{% endblock title %}
+
+{% block extra-style %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/info/introduction.css' %}">
+{% endblock extra-style %}
+
+{% block content %}
+<div class="info-player-body">
+    <div class="info-player-main">
+
+            <!-- <div class="info-image">
+                <div class="info-team-image" style="background-image: url('{{ team_info.team_club_picture.url }}');">
+                    <div class="info-team-image-overlay"></div>
+                </div>
+            </div> -->
+
+        <div class="info-player-content">
+            <div class="info-player-profile">
+                <img class="info-player-profile-picture" src="{{ player_info.player_picture.url }}" alt="{{ player.player_name }}">
+            </div>
+            <div class="info-player-details">
+                <div class="info-player-team-logo">
+                    <img src="{{ player.team.team_picture.url }}" alt="{{ player.team.team_name }}">
+                </div>
+                <div class="info-player-team-name">{{ player.team.team_name }}</div>
+                <div class="info-player-description">선수 상세 정보</div>
+                <div class="info-player-stats">
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">이름</span>
+                        <span class="info-player-stat-value">{{ player.player_name }}</span>
+                    </div>
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">팀</span>
+                        <span class="info-player-stat-value">{{ player.team.team_name }}</span>
+                    </div>
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">포지션</span>
+                        <span class="info-player-stat-value">{{ player.get_position_display }}</span>
+                    </div>
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">등번호</span>
+                        <span class="info-player-stat-value">{{ player.back_number }}</span>
+                    </div>
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">생년월일</span>
+                        <span class="info-player-stat-value">{{ player.birthday }}</span>
+                    </div>
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">키</span>
+                        <span class="info-player-stat-value">{{ player.height }} cm</span>
+                    </div>
+                    <div class="info-player-stat-row">
+                        <span class="info-player-stat-label">몸무게</span>
+                        <span class="info-player-stat-value">{{ player.weight }} kg</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-community-button">
+            <div class="info-community-button-wrapper">
+                <a class="info-community-button-link" href="#">커뮤니티 바로가기</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}
