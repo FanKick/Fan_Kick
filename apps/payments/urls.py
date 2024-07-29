@@ -3,11 +3,11 @@ from . import views
 
 app_name ='payments'
 urlpatterns = [
-    path('payment/<int:pk>/check/', views.payment_check, name='payment_check'),
-    path('payment/<int:pk>/', views.payment_detail, name='payment_detail'),
+    path('<int:pk>/check/', views.payment_check, name='payment_check'),
+    path('<int:pk>/', views.payment_detail, name='payment_detail'),
 
     path('payment/', views.pay_home, name='pay_home'),
-    path('payment/<int:pk>/subsctiption_pay/', views.subsctiption_pay, name='subsctiption_pay'),
+    path('<int:pk>/subsctiption_pay/', views.subsctiption_pay, name='subsctiption_pay'),
 
     # path('subscribe_payment/<int:pk>/', views.subscribe_payment, name='subscribe_payment'),
     # path('get_customer_uid/<int:pk>/', views.get_customer_uid, name='get_customer_uid'),

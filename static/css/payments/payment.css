@@ -1,0 +1,136 @@
+/* 모달 (background) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 모달 (main-content) */
+.modal-content {
+    background-color: #fefefe;
+    margin: 3% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 600px;
+    height: 830px;
+    max-width: 90%;
+    position: relative;
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    right: 30px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modalPlayerName{
+    padding-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.modalPlayerProfile {
+    padding-top:50px;
+    width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.additional-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    font-size: 18px;
+}
+
+.subscription-price {
+    margin-left: 150px;
+}
+
+.highlight {
+    color:#888;
+}
+
+.notice {
+    margin-top: 40px;
+    width: 80%;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.notice-title {
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.notice ul {
+    list-style: disc;
+}
+
+.notice li {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color:#888;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    font-size: 20px;
+    border: none;
+    margin: 20px 80px;
+    font-weight: 1000;
+}
+
+.cancelButton {
+    background-color: transparent;
+    color: #000;
+    border: none; 
+}
+
+
+#urlmoveButton, #retryPaymentButton {
+    background-color: transparent; 
+    color: #28a745; 
+    border: none; 
+}
+
+.payment-status {
+    font-size: 24px;
+    font-weight: bold;
+    padding-top: 20px;
+}
+
+#modalSubscriptionPeriod {
+    padding-top:10px;
+}
