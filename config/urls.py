@@ -28,6 +28,7 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('contents/', include('apps.contents.urls')),
     path('accounts/', include('apps.accounts.urls')),
+    path('chattings/', include('apps.chattings.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
