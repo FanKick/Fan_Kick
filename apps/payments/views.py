@@ -23,7 +23,7 @@ def pay_home(request):
     )
 
 
-def subsctiption_pay(request,pk):
+def subscription_pay(request,pk):
     player = Player.objects.get(pk=pk)
     subscriber = request.user
 

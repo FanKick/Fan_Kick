@@ -5,24 +5,32 @@
 {% block extra-style %}
 
 <link rel="stylesheet" href="{% static 'css/payments/payment.css' %}">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 
 {% endblock extra-style %}
 
 {% block content %}
+<div class="player-section">
+    <div class="section-title"><h2>구독할 선수를 선택해주세요 !</h2></div>
     {% for player in players %}
-    <h2 class="player-trigger" data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
-        data-player-profile="{% if player.user.profile %}{{ player.user.profile.url }}{% else %}{% endif %}"
-        data-url="{% url 'payments:subsctiption_pay' pk=player.id %}"> <!-- 플레이어별 결제 url 달아줘야됨-->
-        {{ player.player_name }}
-    </h2>
-    {% if player.user.profile %}
-        <img src="{{ player.user.profile.url }}" alt="{{ player.player_name }}'s profile picture" class="player-trigger"
-            data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
-            data-player-profile="{{ player.user.profile.url }}" data-url="{% url 'payments:subsctiption_pay' pk=player.id %}" style="width: 100px; height: auto;">
-    {% else %}
-        <p>No profile picture available.</p>
-    {% endif %}
+        <div class="player-item">
+            {% if player.user.profile %}
+                <img class="player-image player-trigger" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}'s profile picture"
+                     data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
+                     data-player-profile="{{ player.user.profile.url }}" data-url="{% url 'payments:subscription_pay' pk=player.id %}">
+            {% else %}
+                <img class="player-image player-trigger" src="" alt="Default player image"
+                     data-player-id="{{ player.id }}" data-player-name="{{ player.player_name }}"
+                     data-player-profile="" data-url="{% url 'payments:subscription_pay' pk=player.id %}">
+            {% endif %}
+            <img class="team-logo" src="{{ player.team.team_picture.url }}" alt="{{ player.team.team_name }}">
+            <div class="player-info">
+                <p>{{ player.team.team_name }}</p>
+                <h3>{{ player.player_name }}</h3>
+            </div>
+        </div>
     {% endfor %}
+</div>
     
     <!-- Modal -->
     <div class="modal" id="playerModal" style="display:none;">
