@@ -93,4 +93,19 @@ class Migration(migrations.Migration):
             name='joined_teams',
             field=models.ManyToManyField(blank=True, related_name='members', through='accounts.Membership', to='accounts.team'),
         ),
+        migrations.CreateModel(
+            name='Membership',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('date_joined', models.DateTimeField(auto_now_add=True)),
+                ('is_active', models.BooleanField(default=True)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.team')),
+            ],
+        ),
+        migrations.AddField(
+            model_name='customuser',
+            name='joined_teams',
+            field=models.ManyToManyField(blank=True, related_name='members', through='accounts.Membership', to='accounts.team'),
+        ),
     ]
