@@ -16,6 +16,15 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+    @property
+    def total_comments_count(self):
+        total_replies_count = sum(comment.replies_count for comment in self.comments.all())
+        return self.comments.count() + total_replies_count
+    
+    @property
+    def likes_count(self):
+        return self.likes.count()
 
 class Image(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
@@ -33,11 +42,25 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title}"
+    
+    @property
+    def likes_count(self):
+        return self.likes.count()
+
+    @property
+    def replies_count(self):
+        return self.replies.count()
 
 class Like(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes', null=True, blank=True)
 
     def __str__(self):
-        return f"Like by {self.user.username} on {self.post.title}"
+        if self.post:
+            return f"Like by {self.user.username} on {self.post.title}"
+        elif self.comment:
+            return f"Like by {self.user.username} on a comment"
+        else:
+            return f"Like by {self.user.username}"

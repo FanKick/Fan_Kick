@@ -24,10 +24,27 @@ def post_detail_json(request, post_id):
         'profile': profile,
         'content': post.content,
         'images': [image.image_url.url for image in post.images.all()],
-        'comments': [{'id': comment.id, 'username': comment.user.username, 'content': comment.content} for comment in comments],
+        'comments': [{
+            'id': comment.id,
+            'username': comment.user.username,
+            'profile': comment.user.profile.url if comment.user.profile else None,
+            'content': comment.content,
+            'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'likes_count': comment.likes.count(),
+            'replies_count': comment.replies.count(),
+            'replies': [{
+                'id': reply.id,
+                'username': reply.user.username,
+                'profile': reply.user.profile.url if reply.user.profile else None,
+                'content': reply.content,
+                'created_at': reply.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'likes_count': reply.likes.count()
+            } for reply in comment.replies.all()]
+        } for comment in comments],
         'is_member': is_member,
         'user_has_liked': user_has_liked,
         'likes_count': likes_count,
+        'total_comments_count': post.total_comments_count
     }
     return JsonResponse(data)
 
@@ -219,7 +236,7 @@ def join_team(request, team_id):
 @csrf_exempt
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    
+
     # 사용자가 플레이어인 경우 팀 확인
     if request.user.role == 'player':
         is_member = Player.objects.filter(user=request.user, team=post.team).exists()
@@ -229,45 +246,63 @@ def add_comment(request, post_id):
 
     if not is_member:
         return JsonResponse({'success': False, 'error': 'You are not a member of this team.'}, status=403)
-    
+
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.user = request.user
             comment.post = post
+
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                parent_comment = get_object_or_404(Comment, id=parent_id)
+                comment.parent = parent_comment
+
             comment.save()
-            return JsonResponse({'success': True, 'username': comment.user.username, 'content': comment.content})
+            return JsonResponse({
+                'success': True, 
+                'username': comment.user.username, 
+                'profile': comment.user.profile.url if comment.user.profile else None,
+                'content': comment.content,
+                'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'likes_count': comment.likes.count(),
+                'replies_count': comment.replies.count(),
+                'comment_id': comment.id,  # 댓글 ID 반환
+            })
         else:
             return JsonResponse({'success': False, 'errors': comment_form.errors.as_json()})
-    
+
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
 
 
 @login_required
 @csrf_exempt
-def add_like(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    
-    # 사용자가 플레이어인 경우 팀 확인
-    if request.user.role == 'player':
-        is_member = Player.objects.filter(user=request.user, team=post.team).exists()
-    else:
-        # 사용자가 일반 사용자(user)인 경우 멤버십 확인
-        is_member = Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists()
+def add_like(request, post_id=None, comment_id=None):
+    user = request.user
+    item = None
 
-    if not is_member:
-        return JsonResponse({'success': False, 'error': 'You are not a member of this team.'}, status=403)
-    
-    like, created = Like.objects.get_or_create(user=request.user, post=post)
-    
+    if post_id:
+        item = get_object_or_404(Post, id=post_id)
+        like, created = Like.objects.get_or_create(user=user, post=item)
+    elif comment_id:
+        item = get_object_or_404(Comment, id=comment_id)
+        like, created = Like.objects.get_or_create(user=user, comment=item)
+
+    if not item:
+        return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
     if not created:
         like.delete()
-        user_has_liked = False
+        liked = False
     else:
-        user_has_liked = True
-    
-    likes_count = post.likes.count()
-    
-    return JsonResponse({'success': True, 'likes_count': likes_count, 'user_has_liked': user_has_liked})
+        liked = True
+
+    like_count = item.likes.count()
+
+    return JsonResponse({
+        'success': True,
+        'likes_count': like_count,
+        'user_has_liked': liked,
+    })
