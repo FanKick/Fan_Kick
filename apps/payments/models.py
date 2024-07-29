@@ -36,8 +36,8 @@ class AbstractPortonePayment(models.Model):
     is_paid = models.BooleanField("결제성공 여부", default=False, db_index=True)
     
     @property
-    def merchant_uid(self) -> str:
-        return self.uid.hex
+    def merchant_uid(self):
+        return self.uid
     
     @cached_property
     def api(self):
@@ -71,7 +71,7 @@ class SubscriptionPayment(AbstractPortonePayment):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE)
     customer_uid = models.CharField(max_length=100, editable=False)
-    next_merchant_uid = models.CharField(max_length=32, blank=True, null=True)
+    next_merchant_uid = models.CharField(max_length=40, blank=True, null=True)
 
 
     @classmethod
@@ -95,14 +95,15 @@ class SubscriptionPayment(AbstractPortonePayment):
         if retry:
             schedule_at = float((timezone.now() + timezone.timedelta(days=1)).timestamp())
         else:
-            schedule_at = float((timezone.now() + timezone.timedelta(days=self.plan.duration)).timestamp())
+            schedule_at = float((timezone.now() + timezone.timedelta(minutes=2)).timestamp())
+            # schedule_at = float((timezone.now() + timezone.timedelta(days=self.plan.duration)).timestamp())
 
-        self.next_merchant_uid = uuid4().hex
+        self.next_merchant_uid = uuid.uuid4()
         self.save()
 
         schedule_payment(
             customer_uid=self.customer_uid,
-            merchant_uid=self.next_merchant_uid,
+            merchant_uid=str(self.next_merchant_uid),
             amount=self.amount,
             schedule_at=schedule_at,
             name=f"{self.player.player_name} 구독권",
@@ -128,7 +129,7 @@ class SubscriptionPayment(AbstractPortonePayment):
 
             # 예약결제건 결제내역 저장
             payment = SubscriptionPayment.objects.create(
-                uid=UUID(self.next_merchant_uid),
+                uid=self.next_merchant_uid,
                 player=self.player,
                 plan=self.plan,
                 customer_uid=self.customer_uid,
