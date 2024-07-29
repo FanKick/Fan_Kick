@@ -1,6 +1,10 @@
 from django.utils.text import slugify
 from django.db import models
-from apps.accounts.models import Player, Team
+from apps.accounts.models import Team
+
+from django.db import models
+from django.conf import settings
+from apps.accounts.models import Player
 
 class PlayerInfo(models.Model):
     player = models.OneToOneField(Player, on_delete=models.CASCADE, related_name='info')
@@ -10,12 +14,12 @@ class PlayerInfo(models.Model):
     def save(self, *args, **kwargs):
         if not self.info_player_name:
             self.info_player_name = slugify(self.player.player_name)
-        if not self.player_picture:
-            self.player_picture.name = 'static/images/default-player.png'
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.player.player_name
+
+
 
 class TeamInfo(models.Model):
     team = models.OneToOneField(Team, on_delete=models.CASCADE, related_name='team_info')
@@ -27,8 +31,6 @@ class TeamInfo(models.Model):
     def save(self, *args, **kwargs):
         if not self.info_team_name:
             self.info_team_name = slugify(self.team.team_name)
-        if not self.team_club_picture:
-            self.team_club_picture.name = 'static/images/default-team.png'
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+FAN KICK - {{ player.player_name }}
+{% endblock title %}
+
+{% block extra-style %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/info/introduction.css' %}">
+{% endblock extra-style %}
+
+{% block content %}
+<div class="info-player-body">
+    <div class="info-player-main">
+        <div class="info-player-content">
+            <h1> 준비중입니다. </h1>
+    </div>
+</div>
+{% endblock content %}

@@ -19,9 +19,9 @@ FAN KICK - {{ team.team_name }}
         </div>
 
         <div class="info-emblem-description">
-            {% if team.team_picture %}
+            {% if team_info.team_club_picture %}
                 <div class="info-team-image-logo">
-                    <img src="{{ team.team_picture.url }}" alt="{{ team.team_name }} 로고">
+                    <img src="{{ team_info.team_club_picture.url }}" alt="{{ team.team_name }} 로고">
                 </div>
             {% endif %}
             <div class="info-description">
@@ -37,7 +37,7 @@ FAN KICK - {{ team.team_name }}
                     <div class="info-players" id="players-fw">
                         {% for player in players_fw %}
                             <div class="info-player-card">
-                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <img class="info-player-image" src="{{ player.profile.url }}" alt="{{ player.player_name }}">
                                 <div class="info-player-name">{{ player.player_name }}</div>
                             </div>
                         {% endfor %}
@@ -51,7 +51,7 @@ FAN KICK - {{ team.team_name }}
                     <div class="info-players" id="players-mf">
                         {% for player in players_mf %}
                             <div class="info-player-card">
-                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <img class="info-player-image" src="{{ player.profile.url }}" alt="{{ player.player_name }}">
                                 <div class="info-player-name">{{ player.player_name }}</div>
                             </div>
                         {% endfor %}
@@ -65,7 +65,7 @@ FAN KICK - {{ team.team_name }}
                     <div class="info-players" id="players-df">
                         {% for player in players_df %}
                             <div class="info-player-card">
-                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <img class="info-player-image" src="{{ player.profile.url }}" alt="{{ player.player_name }}">
                                 <div class="info-player-name">{{ player.player_name }}</div>
                             </div>
                         {% endfor %}
@@ -79,14 +79,13 @@ FAN KICK - {{ team.team_name }}
                     <div class="info-players" id="players-gk">
                         {% for player in players_gk %}
                             <div class="info-player-card">
-                                <img class="info-player-image" src="{{ player.user.profile.url }}" alt="{{ player.player_name }}">
+                                <img class="info-player-image" src="{{ player.profile.url }}" alt="{{ player.player_name }}">
                                 <div class="info-player-name">{{ player.player_name }}</div>
                             </div>
                         {% endfor %}
                     </div>
                     <div class="arrow arrow-right" data-container="gk">&gt;</div> <!-- 오른쪽 화살표 -->
                 </div>
-
             </div>
         </div>
         
@@ -95,7 +94,6 @@ FAN KICK - {{ team.team_name }}
                 <a class="info-community-button-link" href="#">커뮤니티 바로가기</a>
             </div>
         </div>
-        
     </div>
 </div>
 {% endblock %}
