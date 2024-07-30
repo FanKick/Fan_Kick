@@ -366,7 +366,7 @@
 
 /* 댓글 강조 */
 .highlight {
-    background-color: #7ff87f; /* 연한 녹색 배경색 */
+    background-color: #7ff87f !important; /* 연한 녹색 배경색 */
     padding: 5px; /* 강조된 댓글의 패딩 */
     border-radius: 5px; /* 강조된 댓글의 모서리 둥글게 */
 }
