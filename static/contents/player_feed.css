@@ -214,7 +214,9 @@
     display: inline-flex;
     margin-top: auto; /* 자동으로 아래쪽에 위치 */
     margin-bottom: 10px; /* 아래쪽 여백 추가 */
+    
 }
+
 
 .container-297 .community-button-text {
     text-align: center;
