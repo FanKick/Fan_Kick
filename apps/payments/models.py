@@ -95,8 +95,8 @@ class SubscriptionPayment(AbstractPortonePayment):
         if retry:
             schedule_at = float((timezone.now() + timezone.timedelta(days=1)).timestamp())
         else:
-            schedule_at = float((timezone.now() + timezone.timedelta(minutes=2)).timestamp())
-            # schedule_at = float((timezone.now() + timezone.timedelta(days=self.plan.duration)).timestamp())
+            # schedule_at = float((timezone.now() + timezone.timedelta(minutes=2)).timestamp())
+            schedule_at = float((timezone.now() + timezone.timedelta(days=self.plan.duration)).timestamp())
 
         self.next_merchant_uid = uuid.uuid4()
         self.save()
