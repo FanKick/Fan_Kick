@@ -92,7 +92,7 @@ FAN KICK - {{ team.team_name }}
         
         <div class="info-community-button">
             <div class="info-community-button-wrapper">
-                <a class="info-community-button-link" href="#">커뮤니티 바로가기</a>
+                <a class="info-community-button-link" href="{% url 'contents:user_post_list' team_id=team.id %}">커뮤니티 바로가기</a>
             </div>
         </div>
         

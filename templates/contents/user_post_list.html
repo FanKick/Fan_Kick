@@ -129,7 +129,9 @@
     <div class="container-297-team">
         <img src="{{ team.team_picture.url }}" alt="Team Image" class="team-image">
         <div class="fc-seoul-badge">
-            
+            <a href="{% url 'team_detail' info_team_name=team.team_info.info_team_name %}" class="team-name-link">
+                {{ team.team_name }}
+            </a>
         </div>
         {% if request.user.is_authenticated and request.user|user_is_role:'user' %}
         <a href="#" class="community-button" id="join-community" data-team-id="{{ team.id }}">
