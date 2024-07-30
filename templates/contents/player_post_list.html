@@ -85,7 +85,7 @@
                 <div class="profile-button">
                     <div class="profile-icon">
                         {% if post.user.profile %}
-                            <img src="/media/{{ post.user.profile.name }}" alt="Profile Image" class="container-297 profile-icon-inner">
+                            <img src="{{ post.user.profile.url }}" alt="Profile Image" class="container-297 profile-icon-inner">
                         {% else %}
                             <img src="{% static 'contents/Frame.png' %}" alt="Profile Image" class="container-297 profile-icon-inner">
                         {% endif %}
@@ -116,7 +116,7 @@
                         <div class="icon-container">
                             <img src="{% static 'contents/comment.png' %}" alt="Comment Icon" class="icon-comment">
                         </div>
-                        <div class="count comment-count">{{ post.comments.count }}</div>
+                        <div class="count comment-count">{{ post.total_comments_count }}</div>
                     </div>
                 </div>
                 <div class="divider"></div>
@@ -138,11 +138,10 @@
             <span class="community-button-text">커뮤니티 가입하기</span>
         </a>
         {% else %}
-            <div class="community-button-placeholder"></div>
+        <div class="community-button-placeholder"></div>
         {% endif %}
     </div>
 </div>
-
 
 <!-- Post Detail 모달 -->
 <div id="postModal" class="post_modal modal">
@@ -152,25 +151,185 @@
             <div id="postModalContent"></div>
         </div>
         <div class="modal-right">
-            <div id="commentsContainer">
-                <ul id="commentsList">
-                    {% for comment in post.comments.all %}
-                    <li id="comment-{{ comment.id }}">
-                        <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
-                    </li>
-                    {% endfor %}
-                </ul>
+            <div class="modal-header">
+                <div class="left"></div>
+                <div class="middle">
+                    <div class="title">{{ post.total_comments_count }}개의 댓글</div>
+                </div>
+                <div class="right">
+                    <div class="icon">
+                        <img src="{% static 'contents/redirect.png' %}" alt="Redirect Icon" />
+                    </div>
+                </div>
             </div>
-            <form id="commentForm">
-                <textarea id="commentText" placeholder="댓글을 입력하세요..."></textarea>
-                <button type="button" id="submitComment">댓글 등록</button>
-            </form>
+            <div class="modal-body">
+                <div class="content" id="commentsContainer">
+                    <ul id="commentsList">
+                        {% for comment in post.comments.all %}
+                        <li id="comment-{{ comment.id }}" class="modal-content-item">
+                            <div class="comment-header">
+                                <div class="profile-button">
+                                    <div class="profile-icon-inner">
+                                        {% if comment.user.profile.url %}
+                                            <img src="{{ comment.user.profile.url }}" alt="Profile Image">
+                                        {% else %}
+                                            <img src="{% static 'contents/Frame.png' %}" alt="Default Profile Image">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="username">{{ comment.user.username }}</div>
+                                <div class="time">{{ comment.created_at|date:"m.d H:i" }}</div>
+                            </div>
+                            <div class="comment-content">
+                                {{ comment.content }}
+                            </div>
+                            <div class="comment-actions">
+                                <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="comment-action-icon" data-comment-id="{{ comment.id }}">
+                                <span>{{ comment.likes.count }}</span>
+                                <img src="{% static 'contents/comment.png' %}" alt="Reply Icon" class="comment-action-icon reply-button" data-comment-id="{{ comment.id }}" data-reply-id="{{ comment.id }}">
+                                <span>{{ comment.replies.count }}</span>
+                            </div>
+                            <ul class="replies">
+                                {% for reply in comment.replies.all %}
+                                <li id="comment-{{ reply.id }}" class="modal-content-item">
+                                    <div class="comment-header">
+                                        <div class="profile-button">
+                                            <div class="profile-icon-inner">
+                                                <img src="{{ reply.user.profile.url }}" alt="Profile Image">
+                                            </div>
+                                        </div>
+                                        <div class="username">{{ reply.user.username }}</div>
+                                        <div class="time">{{ reply.created_at|date:"m.d H:i" }}</div>
+                                    </div>
+                                    <div class="comment-content">
+                                        {{ reply.content }}
+                                    </div>
+                                    <div class="comment-actions">
+                                        <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="comment-action-icon" data-comment-id="{{ reply.id }}">
+                                        <span>{{ reply.likes.count }}</span>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="input-container">
+                    <input type="text" id="commentText" class="input-text" placeholder="댓글을 입력하세요." />
+                </div>
+                <div class="button-container">
+                    <button type="button" id="submitComment" class="button-icon">
+                        <img src="{% static 'contents/Arrow_up.png' %}" alt="Submit Comment" />
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    var userIsAuthenticated = "{{ request.user.is_authenticated|yesno:'true,false' }}";
+    var currentPostId = null;
+
+    function togglePostLike(postId, likeIcon, mainLikeIcon, mainLikesCount) {
+        fetch(`/contents/post_detail/${postId}/add_like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('likes-count').textContent = data.likes_count;
+                mainLikesCount.textContent = data.likes_count;
+                if (data.user_has_liked) {
+                    likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                    mainLikeIcon.src = "{% static 'contents/like_liked.png' %}";
+                    mainLikeIcon.setAttribute('data-liked', 'true');
+                    likeIcon.setAttribute('data-liked', 'true');
+                } else {
+                    likeIcon.src = "{% static 'contents/like.png' %}";
+                    mainLikeIcon.src = "{% static 'contents/like.png' %}";
+                    mainLikeIcon.setAttribute('data-liked', 'false');
+                    likeIcon.setAttribute('data-liked', 'false');
+                }
+            } else {
+                alert('좋아요를 변경하는 데 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    }
+
+    function toggleCommentLike(commentId, likeIcon) {
+        fetch(`/contents/comment/${commentId}/add_like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var likeCountSpan = likeIcon.nextElementSibling;
+                likeCountSpan.textContent = data.likes_count;
+                if (data.user_has_liked) {
+                    likeIcon.src = "{% static 'contents/like_liked.png' %}";
+                    likeIcon.setAttribute('data-liked', 'true');
+                } else {
+                    likeIcon.src = "{% static 'contents/like.png' %}";
+                    likeIcon.setAttribute('data-liked', 'false');
+                }
+            } else {
+                alert('좋아요를 변경하는 데 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    }
+
+    document.querySelectorAll('.icon-like').forEach(likeIcon => {
+        likeIcon.addEventListener('click', function() {
+            const postId = likeIcon.getAttribute('data-post-id');
+            if (postId) {
+                const mainLikeIcon = document.querySelector(`.icon-like[data-post-id="${postId}"]`);
+                const mainLikesCount = mainLikeIcon.closest('.like-comment-container').querySelector('.count');
+                togglePostLike(postId, likeIcon, mainLikeIcon, mainLikesCount);
+            }
+        });
+    });
+
+    document.querySelectorAll('.comment-action-icon[data-comment-id]').forEach(likeIcon => {
+        likeIcon.addEventListener('click', function() {
+            const commentId = likeIcon.getAttribute('data-comment-id');
+            if (likeIcon.classList.contains('like-button')) {
+                toggleCommentLike(commentId, likeIcon);
+            } else if (likeIcon.classList.contains('reply-button')) {
+                const parentId = commentId;
+                const replyText = prompt('답글을 입력하세요:');
+                if (replyText) {
+                    submitReply(currentPostId, parentId, replyText);
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('.comment-action-icon[data-reply-id]').forEach(likeIcon => {
+        likeIcon.addEventListener('click', function() {
+            const replyId = likeIcon.getAttribute('data-reply-id');
+            toggleCommentLike(replyId, likeIcon, true);
+        });
+    });
+
     var inputField = document.getElementById('post-create-input');
     var modal = document.getElementById('post-create-modal');
     var closeBtn = document.getElementById('modal-close-create');
@@ -178,14 +337,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var imageInput = document.getElementById('image-input');
     var fileInfo = document.getElementById('file-info');
     var submitBtn = document.getElementById('modal-submit-button');
-
+    
     var detailModal = document.getElementById('postModal');
     var detailCloseBtn = document.getElementById('modal-close-detail');
     var postModalContent = document.getElementById('postModalContent');
     var commentsContainer = document.getElementById('commentsContainer');
     var submitComment = document.getElementById('submitComment');
-
-    var userIsAuthenticated = "{{ request.user.is_authenticated|yesno:'true,false' }}";
+    var refreshIcon = document.querySelector('.icon img[alt="Redirect Icon"]');
 
     modal.classList.add('hidden');
     modal.style.display = "none";
@@ -289,12 +447,13 @@ document.addEventListener('DOMContentLoaded', function() {
         postDetail.addEventListener('click', function() {
             if (!userIsAuthenticated) {
                 alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-                window.location.href = "{% url 'accounts:login' %}"; // 로그인 페이지 URL로 리디렉션
+                window.location.href = "{% url 'accounts:login' %}";
                 return;
             }
             var postId = postDetail.getAttribute('data-post-id');
+            currentPostId = postId;
             var postModal = document.getElementById('postModal');
-            postModal.setAttribute('data-post-id', postId); // 포스트 ID 설정
+            postModal.setAttribute('data-post-id', postId);
             fetch(`/contents/post_detail/${postId}/`)
                 .then(response => {
                     if (response.status === 401) {
@@ -303,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.json();
                 })
                 .then(data => {
-                    var profileImageUrl = data.profile ? data.profile :`{% static 'contents/Frame.png' %}`;
+                    var profileImageUrl = data.profile ? data.profile : `{% static 'contents/Frame.png' %}`;
                     
                     postModalContent.innerHTML = `
                         <div class="post-modal-content">
@@ -319,8 +478,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <div class="post-modal-body">
                                 <p class="post-modal-text">${data.content}</p>
-                                <ul class="post-images-grid" data-image-count="${data.images.length}">
-                                    ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image" /></li>`).join('')}
+                                <ul class="post-images-grid ${data.images.length === 1 ? 'grid-1' : data.images.length === 2 ? 'grid-2' : 'grid-3'}">
+                                    ${data.images.map(image => `
+                                        <li class="post-image-item">
+                                            <img src="${image}" alt="Post Image" class="post-image">
+                                        </li>
+                                    `).join('')}
                                 </ul>
                             </div>
                             <div class="post-modal-footer">
@@ -332,81 +495,110 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
 
+                    document.querySelector('.modal-header .title').textContent = `${data.total_comments_count}개의 댓글`;
+
                     var likeIcon = document.getElementById('like-icon');
                     if (data.user_has_liked) {
                         likeIcon.src = "{% static 'contents/like_liked.png' %}";
                     } else {
                         likeIcon.src = "{% static 'contents/like.png' %}";
                     }
-
+                    
                     var mainLikeIcon = document.querySelector(`.icon-like[data-post-id="${postId}"]`);
                     var mainLikesCount = mainLikeIcon.closest('.like-comment-container').querySelector('.count');
                     
-                    // 포스트 디테일 모달에서 좋아요 아이콘 클릭 시 처리
                     likeIcon.addEventListener('click', function() {
-                        fetch(`/contents/post_detail/${postId}/add_like/`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}',
-                            },
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                document.getElementById('likes-count').textContent = data.likes_count;
-                                mainLikesCount.textContent = data.likes_count;
-                                if (data.user_has_liked) {
-                                    likeIcon.src = "{% static 'contents/like_liked.png' %}";
-                                    mainLikeIcon.src = "{% static 'contents/like_liked.png' %}";
-                                    mainLikeIcon.setAttribute('data-liked', 'true');
-                                    likeIcon.setAttribute('data-liked', 'true');
-                                } else {
-                                    likeIcon.src = "{% static 'contents/like.png' %}";
-                                    mainLikeIcon.src = "{% static 'contents/like.png' %}";
-                                    mainLikeIcon.setAttribute('data-liked', 'false');
-                                    likeIcon.setAttribute('data-liked', 'false');
-                                }
-                            } else {
-                                alert('좋아요를 변경하는 데 실패했습니다.');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred: ' + error.message);
-                        });
+                        togglePostLike(postId, likeIcon, mainLikeIcon, mainLikesCount);
                     });
 
                     var commentsHTML = data.comments.map(comment => `
-                        <li>
-                            <strong>${comment.username}</strong>: ${comment.content}
+                        <li id="comment-${comment.id}" class="modal-content-item ${comment.id == commentId ? 'highlight' : ''}">
+                            <div class="comment-header">
+                                <div class="profile-button">
+                                    <div class="profile-icon-inner">
+                                        ${comment.profile ? `<img src="${comment.profile}" alt="Profile Image">` : `<img src="{% static 'contents/Frame.png' %}" alt="Default Profile Image">`}
+                                    </div>
+                                </div>
+                                <div class="username">${comment.username}</div>
+                                <div class="time">${comment.created_at}</div>
+                            </div>
+                            <div class="comment-content">
+                                ${comment.content}
+                            </div>
+                            <div class="comment-actions">
+                                <img src="${comment.user_has_liked ? "{% static 'contents/like_liked.png' %}" : "{% static 'contents/like.png' %}"}" alt="Like Icon" class="comment-action-icon" data-comment-id="${comment.id}">
+                                <span>${comment.likes_count}</span>
+                                <img src="{% static 'contents/comment.png' %}" alt="Reply Icon" class="comment-action-icon reply-button" data-comment-id="${comment.id}">
+                                <span>${comment.replies_count}</span>
+                            </div>
+                            <ul class="replies">
+                                ${comment.replies.map(reply => `
+                                    <li id="comment-${reply.id}" class="modal-content-item">
+                                        <div class="comment-header">
+                                            <div class="profile-button">
+                                                <div class="profile-icon-inner">
+                                                    ${reply.profile ? `<img src="${reply.profile}" alt="Profile Image">` : `<img src="{% static 'contents/Frame.png' %}" alt="Default Profile Image">`}
+                                                </div>
+                                            </div>
+                                            <div class="username">${reply.username}</div>
+                                            <div class="time">${reply.created_at}</div>
+                                        </div>
+                                        <div class="comment-content">
+                                            ${reply.content}
+                                        </div>
+                                        <div class="comment-actions">
+                                            <img src="${reply.user_has_liked ? "{% static 'contents/like_liked.png' %}" : "{% static 'contents/like.png' %}"}" alt="Like Icon" class="comment-action-icon" data-comment-id="${reply.id}">
+                                            <span>${reply.likes_count}</span>
+                                        </div>
+                                    </li>
+                                `).join('')}
+                            </ul>
                         </li>
                     `).join('');
-                    commentsContainer.querySelector('ul').innerHTML = commentsHTML;
-                    console.log('commentsHTML:', commentsHTML); // 디버깅 메시지
 
-                    // post_id를 댓글 폼에 설정
-                    submitComment.setAttribute('data-post-id', postId);
+                    document.getElementById('commentsList').innerHTML = commentsHTML;
 
-                    var postImagesGrid = postModalContent.querySelector('.post-images-grid');
-                    var postImageCount = postImagesGrid.getAttribute('data-image-count');
-                    if (postImageCount == 1) {
-                        postImagesGrid.classList.add('grid-1');
-                    } else if (postImageCount == 2) {
-                        postImagesGrid.classList.add('grid-2');
-                    } else if (postImageCount == 3) {
-                        postImagesGrid.classList.add('grid-3');
-                    } else if (postImageCount > 3) {
-                        postImagesGrid.classList.add('grid-4');
+                    document.querySelectorAll('.reply-button').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const parentId = button.getAttribute('data-comment-id');
+                            const replyText = prompt('답글을 입력하세요:');
+                            if (replyText) {
+                                submitReply(postId, parentId, replyText);
+                            }
+                        });
+                    });
+
+                    // 댓글 및 대댓글 좋아요 버튼에 이벤트 리스너 추가
+                    document.querySelectorAll('.comment-action-icon[data-comment-id]').forEach(icon => {
+                        icon.addEventListener('click', function() {
+                            const commentId = icon.getAttribute('data-comment-id');
+                            toggleCommentLike(commentId, icon);
+                        });
+                    });
+
+                    if (commentId) {
+                        const commentElement = document.getElementById(`comment-${commentId}`);
+                        if (commentElement) {
+                            commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            commentElement.classList.add('highlight');
+                        }
                     }
 
                     detailModal.style.display = 'block';
                 })
                 .catch(error => {
                     alert(error.message);
-                    window.location.href = "{% url 'accounts:login' %}"; // 로그인 페이지 URL로 리디렉션
+                    window.location.href = "{% url 'accounts:login' %}";
                 });
         });
     });
+
+    if (refreshIcon) {
+        refreshIcon.addEventListener('click', function() {
+            var postId = detailModal.getAttribute('data-post-id');
+            openPostModal(postId);
+        });
+    }
 
     detailCloseBtn.addEventListener('click', function() {
         detailModal.style.display = 'none';
@@ -414,11 +606,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     submitComment.addEventListener('click', function() {
         if (!userIsAuthenticated) {
-            alert('로그인이 필요합니다.');
-            window.location.href = "{% url 'accounts:login' %}"; // 로그인 페이지 URL로 리디렉션
+            alert('로그인이 필요합니다. 로그인 하시겠습니까?');
+            window.location.href = "{% url 'accounts:login' %}";
             return;
         }
-        var postId = submitComment.getAttribute('data-post-id'); // 이 부분에서 post_id를 가져옴
+        var postId = currentPostId;
         var commentText = document.getElementById('commentText').value.trim();
         
         if (!commentText) {
@@ -440,9 +632,51 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 var newComment = document.createElement('li');
-                newComment.innerHTML = `<strong>${data.username}</strong>: ${data.content}`;
-                commentsContainer.querySelector('ul').appendChild(newComment);
+                newComment.className = 'modal-content-item';
+                newComment.innerHTML = `
+                    <div class="comment-header">
+                        <div class="profile-button">
+                            <div class="profile-icon-inner">
+                                <img src="${data.profile ? data.profile : `{% static 'contents/Frame.png' %}`}" alt="Profile Image">
+                            </div>
+                        </div>
+                        <div class="username">${data.username}</div>
+                        <div class="time">${data.created_at}</div>
+                    </div>
+                    <div class="comment-content">
+                        ${data.content}
+                    </div>
+                    <div class="comment-actions">
+                        <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="comment-action-icon" data-comment-id="${data.comment_id}">
+                        <span>${data.likes_count}</span>
+                        <img src="{% static 'contents/comment.png' %}" alt="Reply Icon" class="comment-action-icon reply-button" data-comment-id="${data.comment_id}">
+                        <span>${data.replies_count}</span>
+                    </div>
+                    <ul class="replies"></ul>
+                `;
+                document.getElementById('commentsList').appendChild(newComment);
                 document.getElementById('commentText').value = '';
+
+                // 댓글 수 업데이트
+                var commentCountElement = document.querySelector(`.container-297-post-details[data-post-id="${postId}"] .icon-comment + .count`);
+                if (commentCountElement) {
+                    commentCountElement.textContent = parseInt(commentCountElement.textContent) + 1;
+                }
+
+                // 새로운 대댓글 작성 이벤트 리스너 추가
+                newComment.querySelector('.reply-button').addEventListener('click', function() {
+                    const parentId = newComment.querySelector('.comment-action-icon').getAttribute('data-comment-id');
+                    const replyText = prompt('답글을 입력하세요:');
+                    if (replyText) {
+                        submitReply(postId, parentId, replyText);
+                    }
+                });
+
+                // 새로운 좋아요 이벤트 리스너 추가
+                newComment.querySelector('.comment-action-icon').addEventListener('click', function() {
+                    const commentId = newComment.querySelector('.comment-action-icon').getAttribute('data-comment-id');
+                    toggleCommentLike(commentId, this);
+                });
             } else {
                 alert('댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
             }
@@ -453,11 +687,68 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    function submitReply(postId, parentId, replyText) {
+        var formData = new FormData();
+        formData.append('content', replyText);
+        formData.append('parent_id', parentId);
+
+        fetch(`/contents/post_detail/${postId}/add_comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var reply = document.createElement('li');
+                reply.className = 'modal-content-item';
+                reply.innerHTML = `
+                    <div class="comment-header">
+                        <div class="profile-button">
+                            <div class="profile-icon-inner">
+                                <img src="${data.profile ? data.profile : `{% static 'contents/Frame.png' %}`}" alt="Profile Image">
+                            </div>
+                        </div>
+                        <div class="username">${data.username}</div>
+                        <div class="time">${data.created_at}</div>
+                    </div>
+                    <div class="comment-content">
+                        ${data.content}
+                    </div>
+                    <div class="comment-actions">
+                        <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="comment-action-icon" data-comment-id="${data.comment_id}">
+                        <span>${data.likes_count}</span>
+                    </div>
+                `;
+                document.getElementById(`comment-${parentId}`).querySelector('.replies').appendChild(reply);
+
+                var parentRepliesCountElement = document.querySelector(`#comment-${parentId} .reply-button + span`);
+                if (parentRepliesCountElement) {
+                    parentRepliesCountElement.textContent = parseInt(parentRepliesCountElement.textContent) + 1;
+                }
+
+                reply.querySelector('.comment-action-icon[data-comment-id]').addEventListener('click', function() {
+                    const commentId = reply.getAttribute('data-comment-id');
+                    toggleCommentLike(commentId, this);
+                });
+            } else {
+                alert('대댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    }
+
     window.addEventListener('click', function(event) {
         if (event.target === detailModal) {
             detailModal.style.display = 'none';
         }
     });
+
     // 커뮤니티 가입하기 버튼 클릭 이벤트
     var joinButton = document.getElementById('join-community');
     if (joinButton) {
@@ -488,9 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-});
 
-document.addEventListener('DOMContentLoaded', function() {
     function getQueryParam(param) {
         const params = new URLSearchParams(window.location.search);
         return params.get(param);
@@ -505,23 +794,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function openPostModal(postId, commentId) {
+        currentPostId = postId;
         fetch(`/contents/post_detail/${postId}/`)
             .then(response => response.json())
             .then(data => {
+                var profileImageUrl = data.profile ? data.profile : `{% static 'contents/Frame.png' %}`;
                 const postModalContent = document.getElementById('postModalContent');
                 postModalContent.innerHTML = `
                     <div class="post-modal-content">
-                        <h3>${data.username}</h3>
-                        <p>${data.content}</p>
-                        <ul class="post-images-grid" data-image-count="${data.images.length}">
-                            ${data.images.map(image => `<li class="post-image-item"><img src="${image}" alt="Post Image"></li>`).join('')}
-                        </ul>
-                        <p>
-                            Likes: <span id="likes-count">${data.likes_count}</span>
-                            <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
-                        </p>
+                        <div class="post-modal-header">
+                            <div class="post-modal-profile">
+                                <div class="profile-button">
+                                    <div class="profile-icon-inner">
+                                        <img src="${profileImageUrl}" alt="Profile Image" class="profile-icon-inner-img" />
+                                    </div>
+                                </div>
+                                <h3 class="post-modal-username">${data.username}</h3>
+                            </div>
+                        </div>
+                        <div class="post-modal-body">
+                            <p class="post-modal-text">${data.content}</p>
+                            <ul class="post-images-grid ${data.images.length === 1 ? 'grid-1' : data.images.length === 2 ? 'grid-2' : 'grid-3'}">
+                                ${data.images.map(image => `
+                                    <li class="post-image-item">
+                                        <img src="${image}" alt="Post Image" class="post-image">
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="post-modal-footer">
+                            <p>
+                                Likes: <span id="likes-count">${data.likes_count}</span>
+                                <img src="" alt="Like Icon" id="like-icon" class="icon-like" style="cursor: pointer;" data-liked="${data.user_has_liked}">
+                            </p>
+                        </div>
                     </div>
                 `;
+
+                document.querySelector('.modal-header .title').textContent = `${data.total_comments_count}개의 댓글`;
 
                 const likeIcon = document.getElementById('like-icon');
                 if (data.user_has_liked) {
@@ -530,64 +840,98 @@ document.addEventListener('DOMContentLoaded', function() {
                     likeIcon.src = "{% static 'contents/like.png' %}";
                 }
 
+                var mainLikeIcon = document.querySelector(`.icon-like[data-post-id="${postId}"]`);
+                var mainLikesCount = mainLikeIcon.closest('.like-comment-container').querySelector('.count');
+
                 likeIcon.addEventListener('click', function() {
-                    fetch(`/contents/post_detail/${postId}/add_like/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById('likes-count').textContent = data.likes_count;
-                            if (data.user_has_liked) {
-                                likeIcon.src = "{% static 'contents/like_liked.png' %}";
-                                likeIcon.setAttribute('data-liked', 'true');
-                            } else {
-                                likeIcon.src = "{% static 'contents/like.png' %}";
-                                likeIcon.setAttribute('data-liked', 'false');
-                            }
-                        } else {
-                            alert('좋아요를 변경하는 데 실패했습니다.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred: ' + error.message);
-                    });
+                    togglePostLike(postId, likeIcon, mainLikeIcon, mainLikesCount);
                 });
 
-                const commentsHTML = data.comments.map(comment => `
-                    <li id="comment-${comment.id}" class="${comment.id == commentId ? 'highlight' : ''}">
-                        <strong>${comment.username}</strong>: ${comment.content}
+                var commentsHTML = data.comments.map(comment => `
+                    <li id="comment-${comment.id}" class="modal-content-item ${comment.id == commentId ? 'highlight' : ''}">
+                        <div class="comment-header">
+                            <div class="profile-button">
+                                <div class="profile-icon-inner">
+                                    ${comment.profile ? `<img src="${comment.profile}" alt="Profile Image">` : `<img src="{% static 'contents/Frame.png' %}" alt="Default Profile Image">`}
+                                </div>
+                            </div>
+                            <div class="username">${comment.username}</div>
+                            <div class="time">${comment.created_at}</div>
+                        </div>
+                        <div class="comment-content">
+                            ${comment.content}
+                        </div>
+                        <div class="comment-actions">
+                            <img src="${comment.user_has_liked ? "{% static 'contents/like_liked.png' %}" : "{% static 'contents/like.png' %}"}" alt="Like Icon" class="comment-action-icon" data-comment-id="${comment.id}">
+                            <span>${comment.likes_count}</span>
+                            <img src="{% static 'contents/comment.png' %}" alt="Reply Icon" class="comment-action-icon reply-button" data-comment-id="${comment.id}">
+                            <span>${comment.replies_count}</span>
+                        </div>
+                        <ul class="replies">
+                            ${comment.replies.map(reply => `
+                                <li id="comment-${reply.id}" class="modal-content-item">
+                                    <div class="comment-header">
+                                        <div class="profile-button">
+                                            <div class="profile-icon-inner">
+                                                ${reply.profile ? `<img src="${reply.profile}" alt="Profile Image">` : `<img src="{% static 'contents/Frame.png' %}" alt="Default Profile Image">`}
+                                            </div>
+                                        </div>
+                                        <div class="username">${reply.username}</div>
+                                        <div class="time">${reply.created_at}</div>
+                                    </div>
+                                    <div class="comment-content">
+                                        ${reply.content}
+                                    </div>
+                                    <div class="comment-actions">
+                                        <img src="${reply.user_has_liked ? "{% static 'contents/like_liked.png' %}" : "{% static 'contents/like.png' %}"}" alt="Like Icon" class="comment-action-icon" data-comment-id="${reply.id}">
+                                        <span>${reply.likes_count}</span>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
                     </li>
                 `).join('');
                 document.getElementById('commentsList').innerHTML = commentsHTML;
 
                 document.getElementById('postModal').style.display = 'block';
-                document.getElementById('postModal').setAttribute('data-post-id', postId); // postId 설정
+                document.getElementById('postModal').setAttribute('data-post-id', postId);
+
+                document.querySelectorAll('.reply-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const parentId = button.getAttribute('data-comment-id');
+                        const replyText = prompt('답글을 입력하세요:');
+                        if (replyText) {
+                            submitReply(postId, parentId, replyText);
+                        }
+                    });
+                });
+
+                // 댓글 및 대댓글 좋아요 버튼에 이벤트 리스너 추가
+                document.querySelectorAll('.comment-action-icon[data-comment-id]').forEach(icon => {
+                    icon.addEventListener('click', function() {
+                        const commentId = icon.getAttribute('data-comment-id');
+                        toggleCommentLike(commentId, icon);
+                    });
+                });
 
                 if (commentId) {
                     const commentElement = document.getElementById(`comment-${commentId}`);
-                    console.log('commentElement:', commentElement); // 디버깅 메시지
                     if (commentElement) {
                         commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        commentElement.classList.add('highlight'); // 강조 클래스 추가
-
+                        commentElement.classList.add('highlight');
                     }
                 }
             });
     }
 
-            // 기존 이벤트 리스너 제거 및 새로 등록
-            const submitCommentButton = document.getElementById('submitComment');
-            const newSubmitCommentButton = submitCommentButton.cloneNode(true);
-            submitCommentButton.parentNode.replaceChild(newSubmitCommentButton, submitCommentButton);
+    // 기존 이벤트 리스너 제거 및 새로 등록
+    const submitCommentButton = document.getElementById('submitComment');
+    const newSubmitCommentButton = submitCommentButton.cloneNode(true);
+    submitCommentButton.parentNode.replaceChild(newSubmitCommentButton, submitCommentButton);
 
-            newSubmitCommentButton.addEventListener('click', function() {
-                const postId = document.getElementById('postModal').getAttribute('data-post-id');
-                const commentText = document.getElementById('commentText').value.trim();
+    newSubmitCommentButton.addEventListener('click', function() {
+        const postId = currentPostId;
+        const commentText = document.getElementById('commentText').value.trim();
 
         if (!commentText) {
             alert('댓글 내용을 입력하세요.');
@@ -608,7 +952,27 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 const newComment = document.createElement('li');
-                newComment.innerHTML = `<strong>${data.username}</strong>: ${data.content}`;
+                newComment.innerHTML = `
+                    <div class="comment-header">
+                        <div class="profile-button">
+                            <div class="profile-icon-inner">
+                                <img src="${data.profile ? data.profile : `{% static 'contents/Frame.png' %}`}" alt="Profile Image">
+                            </div>
+                        </div>
+                        <div class="username">${data.username}</div>
+                        <div class="time">${data.created_at}</div>
+                    </div>
+                    <div class="comment-content">
+                        ${data.content}
+                    </div>
+                    <div class="comment-actions">
+                        <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="comment-action-icon" data-comment-id="${data.comment_id}">
+                        <span>${data.likes_count}</span>
+                        <img src="{% static 'contents/comment.png' %}" alt="Reply Icon" class="comment-action-icon reply-button" data-comment-id="${data.comment_id}">
+                        <span>${data.replies_count}</span>
+                    </div>
+                    <ul class="replies"></ul>
+                `;
                 document.getElementById('commentsList').appendChild(newComment);
                 document.getElementById('commentText').value = '';
 
@@ -617,6 +981,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (commentCountElement) {
                     commentCountElement.textContent = parseInt(commentCountElement.textContent) + 1;
                 }
+
+                // 새로운 대댓글 작성 이벤트 리스너 추가
+                newComment.querySelector('.reply-button').addEventListener('click', function() {
+                    const parentId = newComment.querySelector('.comment-action-icon').getAttribute('data-comment-id');
+                    const replyText = prompt('답글을 입력하세요:');
+                    if (replyText) {
+                        submitReply(postId, parentId, replyText);
+                    }
+                });
+
+                // 새로운 좋아요 이벤트 리스너 추가
+                newComment.querySelector('.comment-action-icon').addEventListener('click', function() {
+                    const commentId = newComment.querySelector('.comment-action-icon').getAttribute('data-comment-id');
+                    toggleCommentLike(commentId, this);
+                });
             } else {
                 alert('댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
             }
@@ -626,8 +1005,68 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred: ' + error.message);
         });
     });
-});
 
+    function submitReply(postId, parentId, replyText) {
+        var formData = new FormData();
+        formData.append('content', replyText);
+        formData.append('parent_id', parentId);
+
+        fetch(`/contents/post_detail/${postId}/add_comment/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var reply = document.createElement('li');
+                reply.className = 'modal-content-item';
+                reply.innerHTML = `
+                    <div class="comment-header">
+                        <div class="profile-button">
+                            <div class="profile-icon-inner">
+                                <img src="${data.profile ? data.profile : `{% static 'contents/Frame.png' %}`}" alt="Profile Image">
+                            </div>
+                        </div>
+                        <div class="username">${data.username}</div>
+                        <div class="time">${data.created_at}</div>
+                    </div>
+                    <div class="comment-content">
+                        ${data.content}
+                    </div>
+                    <div class="comment-actions">
+                        <img src="{% static 'contents/like.png' %}" alt="Like Icon" class="comment-action-icon" data-comment-id="${data.comment_id}">
+                        <span>${data.likes_count}</span>
+                    </div>
+                `;
+                document.getElementById(`comment-${parentId}`).querySelector('.replies').appendChild(reply);
+
+                var parentRepliesCountElement = document.querySelector(`#comment-${parentId} .reply-button + span`);
+                if (parentRepliesCountElement) {
+                    parentRepliesCountElement.textContent = parseInt(parentRepliesCountElement.textContent) + 1;
+                }
+
+                reply.querySelector('.comment-action-icon[data-comment-id]').addEventListener('click', function() {
+                    const commentId = reply.getAttribute('data-comment-id');
+                    toggleCommentLike(commentId, this);
+                });
+            } else {
+                alert('대댓글 작성에 실패했습니다. ' + (data.error || JSON.stringify(data.errors)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
+    }
+
+    window.addEventListener('click', function(event) {
+        if (event.target === detailModal) {
+            detailModal.style.display = 'none';
+        }
+    });
+});
 </script>
 {% endblock %}
-

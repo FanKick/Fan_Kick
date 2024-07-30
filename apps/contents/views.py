@@ -13,7 +13,7 @@ def post_detail_json(request, post_id):
         return JsonResponse({'error': '로그인이 필요합니다.'}, status=401)
 
     post = get_object_or_404(Post, id=post_id)
-    comments = post.comments.all()
+    comments = post.comments.filter(parent__isnull=True)  # 최상위 댓글만 가져옵니다.
     is_member = Membership.objects.filter(user=request.user, team=post.team, is_active=True).exists()
     user_has_liked = Like.objects.filter(user=request.user, post=post).exists()
     likes_count = post.likes.count()
@@ -31,6 +31,7 @@ def post_detail_json(request, post_id):
             'content': comment.content,
             'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'likes_count': comment.likes.count(),
+            'user_has_liked': comment.likes.filter(user=request.user).exists(),
             'replies_count': comment.replies.count(),
             'replies': [{
                 'id': reply.id,
@@ -38,7 +39,8 @@ def post_detail_json(request, post_id):
                 'profile': reply.user.profile.url if reply.user.profile else None,
                 'content': reply.content,
                 'created_at': reply.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                'likes_count': reply.likes.count()
+                'likes_count': reply.likes.count(),
+                'user_has_liked': reply.likes.filter(user=request.user).exists(),
             } for reply in comment.replies.all()]
         } for comment in comments],
         'is_member': is_member,
@@ -98,57 +100,6 @@ class PlayerPostListView(ListView):
         
         return context
 
-# 로그인 + 멤버쉽 가입 확인
-# @login_required
-# def create_post(request):
-#     if request.user.role not in ['player', 'user']:
-#         return HttpResponseForbidden("You are not allowed to create a post.")
-    
-#     team_id = request.GET.get('team_id')
-#     if not team_id:
-#         return HttpResponseForbidden("No team specified.")
-    
-#     team = get_object_or_404(Team, id=team_id)
-
-#     is_member = Membership.objects.filter(user=request.user, team=team, is_active=True).exists()
-#     is_player = Player.objects.filter(user=request.user, team=team).exists()
-
-#     if request.user.role == 'player' and not is_player:
-#         return HttpResponseForbidden("You are not a player of this team.")
-    
-#     if request.user.role == 'user' and not is_member:
-#         return HttpResponseForbidden("You are not a member of this team.")
-
-#     ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=3)
-    
-#     if request.method == 'POST':
-#         post_form = PostForm(request.POST)
-#         formset = ImageFormSet(request.POST, request.FILES, queryset=Image.objects.none())
-
-#         if post_form.is_valid() and formset.is_valid():
-#             post = post_form.save(commit=False)
-#             post.user = request.user
-#             post.team = team
-#             post.save()
-
-#             for form in formset.cleaned_data:
-#                 if form:
-#                     image = form['image_url']
-#                     photo = Image(post=post, image_url=image)
-#                     photo.save()
-
-#             if request.user.role == 'player':
-#                 return redirect('player_post_list')
-#             else:
-#                 return redirect('user_post_list')
-#     else:
-#         post_form = PostForm()
-#         formset = ImageFormSet(queryset=Image.objects.none())
-
-#     return render(request, 'contents/post_form.html', {
-#         'post_form': post_form,
-#         'formset': formset,
-#     })
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
