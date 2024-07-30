@@ -148,7 +148,7 @@ table tbody:empty{
 .subscription-status {
   font-family: 'Pretendard GOV Variable';
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 20px;
   word-wrap: break-word;
   padding: 10px 10px; /* 패딩 추가 */
@@ -212,4 +212,31 @@ table tbody:empty{
 
 .filter-options input[type="radio"] {
   accent-color: #006600; /* Change the color of the radio button when selected */
+}
+
+
+/* 정기구독 취소 버튼 */
+.btn-cancel {
+  cursor: pointer;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px; 
+  background: #e4e4e4; 
+  border-radius: 14px; 
+  overflow: hidden; 
+  justify-content: center; 
+  align-items: center; 
+  display: inline-flex;
+  border: none;
+  color: #EA3838;
+  font-family: 'Pretendard GOV Variable';
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  word-wrap: break-word;
+}
+
+.btn-cancel:hover {
+  color: #ffffff;
 }

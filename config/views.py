@@ -5,6 +5,8 @@ from apps.info.models import TeamInfo
 def home(request):
     user = request.user
     teams = Team.objects.all()
+    # teaminfos = TeamInfo.objects.all()
+    teaminfos = TeamInfo.objects.select_related('team').all()
 
     players = Player.objects.select_related('user', 'team').all()
 
@@ -17,6 +19,7 @@ def home(request):
         'teams': teams,
         'memberships': memberships,
         'players' : players,
+        'teaminfos': teaminfos,
     }
 
 

@@ -29,6 +29,7 @@
                         <th>구독 시작일</th>
                         <th>구독 종료일</th>
                         <th>상태</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody id="subscription-list">
@@ -46,6 +47,9 @@
                             {% else %}
                                 <span class="subscription-status inactive">구독 종료</span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn-cancel"  data-subscription-id="{{ subscription.id }}">정기구독취소</button>
                         </td>
                     </tr>
                       {% endfor %}
@@ -65,73 +69,107 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  // 라디오 버튼 클릭 시 이벤트 리스너 추가
-  document.querySelectorAll('input[name="subscription-filter"]').forEach(function(radio) {
-      radio.addEventListener('change', function() {
-          var filter = this.value; // 선택된 필터 값 가져오기
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', '{% url "subscriptions:subscription_management" %}?filter=' + filter, true); // AJAX 요청 보내기
-          xhr.onload = function() {
-              if (xhr.status === 200) {
-                  console.log('filter', filter);
-                  var parser = new DOMParser();
-                  var doc = parser.parseFromString(xhr.responseText, 'text/html');
-                  var newSubscriptions = doc.querySelectorAll('#subscription-list tr');
-                  var subscriptionList = document.getElementById('subscription-list');
-                  subscriptionList.innerHTML = ''; // 기존 구독 내역 지우기
-                  newSubscriptions.forEach(function(tr) {
-                      subscriptionList.appendChild(tr); // 새로운 구독 내역 추가
-                  });
-                  var newButton = doc.getElementById('load-more');
-                  var loadMoreContainer = document.querySelector('.load-more-container');
-                  if (newButton) {
-                      loadMoreContainer.innerHTML = '';
-                      loadMoreContainer.appendChild(newButton);
-                      newButton.setAttribute('data-filter', filter); // 필터 값 업데이트
-                      attachLoadMoreListener(); // 이벤트 리스너 다시 추가
-                  } else {
-                      loadMoreContainer.innerHTML = '';
-                  }
-              }
-          };
-          xhr.send(); // AJAX 요청 전송
-      });
-  });
+$(document).ready(function(){
+    // 라디오 버튼 클릭 시 이벤트 리스너 추가
+    $('input[name="subscription-filter"]').change(function() {
+        var filter = this.value; // 선택된 필터 값 가져오기
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '{% url "subscriptions:subscription_management" %}?filter=' + filter, true); // AJAX 요청 보내기
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(xhr.responseText, 'text/html');
+                var newSubscriptions = doc.querySelectorAll('#subscription-list tr');
+                var subscriptionList = document.getElementById('subscription-list');
+                subscriptionList.innerHTML = ''; // 기존 구독 내역 지우기
+                newSubscriptions.forEach(function(tr) {
+                    subscriptionList.appendChild(tr); // 새로운 구독 내역 추가
+                });
+                var newButton = doc.getElementById('load-more');
+                var loadMoreContainer = document.querySelector('.load-more-container');
+                if (newButton) {
+                    loadMoreContainer.innerHTML = '';
+                    loadMoreContainer.appendChild(newButton);
+                    newButton.setAttribute('data-filter', filter); // 필터 값 업데이트
+                    attachLoadMoreListener(); // 이벤트 리스너 다시 추가
+                } else {
+                    loadMoreContainer.innerHTML = '';
+                }
+                attachCancelListener(); // 동적으로 추가된 항목에 이벤트 리스너 추가
+            }
+        };
+        xhr.send(); // AJAX 요청 전송
+    });
 
-  // "more" 버튼 클릭 시 이벤트 리스너 추가
-  function attachLoadMoreListener() {
-      var loadMoreButton = document.getElementById('load-more');
-      if (loadMoreButton) {
-          loadMoreButton.addEventListener('click', function() {
-              var button = this;
-              var nextPage = button.getAttribute('data-next-page');
-              var filter = button.getAttribute('data-filter'); // 필터 값 가져오기
-              var xhr = new XMLHttpRequest();
-              xhr.open('GET', '{% url "subscriptions:subscription_management" %}?page=' + nextPage + '&filter=' + filter, true); // AJAX 요청 보내기
-              xhr.onload = function() {
-                  if (xhr.status === 200) {
-                      var parser = new DOMParser();
-                      var doc = parser.parseFromString(xhr.responseText, 'text/html');
-                      var newSubscriptions = doc.querySelectorAll('#subscription-list tr');
-                      var subscriptionList = document.getElementById('subscription-list');
-                      newSubscriptions.forEach(function(tr) {
-                          subscriptionList.appendChild(tr); // 새로운 구독 내역 추가
-                      });
-                      var newButton = doc.getElementById('load-more');
-                      if (newButton) {
-                          button.setAttribute('data-next-page', newButton.getAttribute('data-next-page'));
-                          button.setAttribute('data-filter', filter); // 필터 값 업데이트
-                      } else {
-                          button.remove();
-                      }
-                  }
-              };
-              xhr.send(); // AJAX 요청 전송
-          });
-      }
-  }
+    // "more" 버튼 클릭 시 이벤트 리스너 추가
+    function attachLoadMoreListener() {
+        var loadMoreButton = document.getElementById('load-more');
+        if (loadMoreButton) {
+            loadMoreButton.addEventListener('click', function() {
+                var button = this;
+                var nextPage = button.getAttribute('data-next-page');
+                var filter = button.getAttribute('data-filter'); // 필터 값 가져오기
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '{% url "subscriptions:subscription_management" %}?page=' + nextPage + '&filter=' + filter, true); // AJAX 요청 보내기
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(xhr.responseText, 'text/html');
+                        var newSubscriptions = doc.querySelectorAll('#subscription-list tr');
+                        var subscriptionList = document.getElementById('subscription-list');
+                        newSubscriptions.forEach(function(tr) {
+                            subscriptionList.appendChild(tr); // 새로운 구독 내역 추가
+                        });
+                        var newButton = doc.getElementById('load-more');
+                        if (newButton) {
+                            button.setAttribute('data-next-page', newButton.getAttribute('data-next-page'));
+                            button.setAttribute('data-filter', filter); // 필터 값 업데이트
+                        } else {
+                            button.remove();
+                        }
+                        attachCancelListener(); // 동적으로 추가된 항목에 이벤트 리스너 추가
+                    }
+                };
+                xhr.send(); // AJAX 요청 전송
+            });
+        }
+    }
 
-  attachLoadMoreListener(); // 초기 이벤트 리스너 추가
+    // 정기구독 취소 버튼
+    function attachCancelListener() {
+        $('.btn-cancel').off('click').on('click', function(){
+            var subscriptionId = $(this).data('subscription-id');
+            if (confirm('정말로 정기구독을 취소하시겠습니까?')) {
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'subscriptions:cancel_subscription' %}",
+                    data: {
+                        'subscription_id': subscriptionId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            location.reload(); 
+                        } else {
+                            alert(response.message || '취소 중 오류가 발생했습니다. 다시 시도해주세요.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('오류가 발생했습니다. 다시 시도해주세요.');
+                    }
+                });
+            }
+        });
+    }
+
+    attachLoadMoreListener(); // 초기 이벤트 리스너 추가
+    attachCancelListener(); // 초기 이벤트 리스너 추가
+});
 </script>
+
+
+
 {% endblock %}
