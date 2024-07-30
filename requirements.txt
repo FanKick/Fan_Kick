@@ -16,6 +16,7 @@ django-debug-toolbar==4.4.6
 django-extensions==3.2.3
 django-timezone-field==7.0
 exceptiongroup==1.2.1
+gunicorn==22.0.0
 iamport-rest-client==0.9.0
 idna==3.7
 iniconfig==2.0.0
