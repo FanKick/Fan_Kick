@@ -14,8 +14,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* 추가: 로고 영역 축소 방지 */
+    flex-shrink: 0; /* 로고 영역 축소 방지 */
+    width: 170px; /* 로고 영역의 고정 너비 */
+
 }
+
+.header a {
+    display: flex;            /* 플렉스박스를 사용하여 가운데 정렬 */
+    justify-content: center; /* 가로 방향 가운데 정렬 */
+    align-items: center;     /* 세로 방향 가운데 정렬 */
+    margin: 0;               /* 기본 마진 제거 */
+    padding: 0;              /* 기본 패딩 제거 */
+    text-decoration: none;   /* 링크의 밑줄 제거 */
+}
+
+.header a img {
+    display: block;          /* 이미지 주변의 여백 제거 */
+}
+
+.header-icon-container {
+    display: flex;
+    justify-content: center; /* 가로 방향 가운데 정렬 */
+    align-items: center;     /* 세로 방향 가운데 정렬 */
+}
+
+.header-icon-container img {
+    width: 24px;             /* 아이콘의 너비 (예시) */
+    height: 24px;            /* 아이콘의 높이 (예시) */
+}
+
+
+
 
 .header-logo img {
     width: 170px;

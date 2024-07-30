@@ -19,12 +19,11 @@
 .search-bar-icon {
     display: flex;
     align-items: center;
-    margin-right: 10px;
 }
 
 .search-bar-icon img {
-    width: 16px;
-    height: 16px;
+    width: 24px; /* 아이콘의 너비 */
+    height: 24px; /* 아이콘의 높이 */
 }
 
 .search-bar-input {
