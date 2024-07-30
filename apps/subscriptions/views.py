@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from .models import Subscription
 from apps.accounts.models import Player
+from apps.payments.models import SubscriptionPayment
+from apps.payments.services import cancel_scheduled_payment
+from django.http import JsonResponse
 
 @login_required
 def subscription_management(request):
@@ -34,3 +38,35 @@ def unsubscribed_players(request):
     }
 
     return render(request, 'payments/pay_home.html', context)
+
+@require_POST
+def cancel_subscription(request):
+    subscription_id = request.POST.get('subscription_id')
+    try:
+        subscription = Subscription.objects.get(id=subscription_id, subscriber=request.user)
+        payment = SubscriptionPayment.objects.filter(
+            user=request.user, 
+            player=subscription.subscribed_to_player, 
+            plan=subscription.plan
+        ).order_by('-created_at').first()
+        
+        if not payment:
+            return JsonResponse({'status': 'error', 'message': '해당 구독에 대한 결제 정보를 찾을 수 없습니다.'})
+        
+
+        response = cancel_scheduled_payment(payment.customer_uid, payment.next_merchant_uid)
+
+        print(f"Cancel scheduled payment response: {response}")
+
+        
+        if response.get('schedule_status') == 'revoked':
+            # 취소 성공
+            return JsonResponse({'status': 'success', 'message': '구독이 성공적으로 취소되었습니다.'})
+        else:
+            # 취소 실패
+            fail_reason = response.get('fail_reason', '취소에 실패했습니다.')
+            return JsonResponse({'status': 'error', 'message': fail_reason})
+    except Subscription.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': '해당 구독을 찾을 수 없습니다.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})

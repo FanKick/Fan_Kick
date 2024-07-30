@@ -49,5 +49,8 @@ def cancel_scheduled_payment(customer_uid, merchant_uid):
     }
 
     response = iamport.pay_unschedule(**payload)
+
+    if isinstance(response, list):
+        response = response[0]
     
     return response
